@@ -1,0 +1,1886 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boussole Niche</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Mise en page : une colonne étroite. Quiz en 8 questions, écran d'analyse, aperçu gratuit avec contenu verrouillé, puis espace Coach en onglets. */
+:root {
+  --bg: #EDF0F7;
+  --surface: #FFFFFF;
+  --ink: #12162B;
+  --muted: #586080;
+  --line: #D3D8E8;
+  --accent: #2B44F5;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E3E7FE;
+  --tint-a: #E4E9FF;
+  --tint-b: #FFEFE0;
+  --tint-c: #DFF4EC;
+  --tint-d: #F0E6FB;
+  --bg2: #E9E6FA;
+  --bg3: #E1F0F0;
+  --good: #16794C;
+  --warn: #A8620B;
+  --bad: #B83A34;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1122;
+    --surface: #171B30;
+    --ink: #E9ECF8;
+    --muted: #9AA2C2;
+    --line: #2A3052;
+    --accent: #8796FF;
+    --accent-ink: #0E1122;
+    --accent-soft: #232A55;
+    --tint-a: #1B2250;
+    --tint-b: #2E2218;
+    --tint-c: #14302A;
+    --tint-d: #2A1E48;
+    --bg2: #16122B;
+    --bg3: #0F1F24;
+    --good: #4CC38A;
+    --warn: #E3AE55;
+    --bad: #FF8F86;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1122;
+  --surface: #171B30;
+  --ink: #E9ECF8;
+  --muted: #9AA2C2;
+  --line: #2A3052;
+  --accent: #8796FF;
+  --accent-ink: #0E1122;
+  --accent-soft: #232A55;
+  --tint-a: #1B2250;
+  --tint-b: #2E2218;
+  --tint-c: #14302A;
+  --tint-d: #2A1E48;
+  --bg2: #16122B;
+  --bg3: #0F1F24;
+  --good: #4CC38A;
+  --warn: #E3AE55;
+  --bad: #FF8F86;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--line) 1px, transparent 1px), linear-gradient(180deg, var(--bg) 0%, var(--bg2) 40%, var(--bg3) 75%, var(--bg) 100%);
+  background-size: 22px 22px, 100% 100%;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 36rem; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+.wrap > * { min-width: 0; }
+
+header { display: flex; flex-direction: column; gap: 6px; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.lede { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.progress { display: flex; gap: 5px; }
+.seg { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+.seg.on { background: var(--accent); }
+
+main { display: flex; flex-direction: column; gap: 16px; outline: none; }
+h2.q {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.55rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+  outline: none;
+}
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  margin: 0;
+  text-wrap: balance;
+}
+.hint { margin: 0; color: var(--muted); max-width: 62ch; }
+
+.opts { display: flex; flex-direction: column; gap: 10px; }
+.opts.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.opt {
+  appearance: none;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  font: inherit;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.opts.grid .opt { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px; min-height: 100px; padding: 12px; }
+.opt:hover { border-color: var(--accent); }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.opt:focus-visible, .btn:focus-visible, .linkbtn:focus-visible, .tab:focus-visible, .field:focus-visible, .chk input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.opt-text { display: flex; flex-direction: column; min-width: 0; }
+.opt-text small { font-weight: 400; font-size: 14px; color: var(--muted); }
+
+.tile {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: #FFFFFF;
+  box-shadow: 0 6px 14px -6px rgba(20, 24, 60, 0.45);
+}
+.tile svg { width: 24px; height: 24px; }
+.tile.lg { width: 56px; height: 56px; border-radius: 15px; }
+.tile.lg svg { width: 30px; height: 30px; }
+.t-cyan { background: linear-gradient(135deg, #19C6C0, #2B7BF5); }
+.t-pink { background: linear-gradient(135deg, #FF6B8A, #E03C8A); }
+.t-orange { background: linear-gradient(135deg, #FFB54A, #F4743B); }
+.t-violet { background: linear-gradient(135deg, #C44BE8, #7F3CF0); }
+.t-green { background: linear-gradient(135deg, #2FCB8B, #12987A); }
+.t-blue { background: linear-gradient(135deg, #4D7CFF, #2B44F5); }
+
+.btn {
+  appearance: none;
+  font: inherit;
+  font-weight: 600;
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+}
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--accent); }
+.btn.small { min-height: 38px; padding: 6px 12px; font-size: 14px; }
+.linkbtn {
+  appearance: none;
+  align-self: flex-start;
+  font: inherit;
+  font-weight: 500;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+
+/* Analyse */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.steps li { display: flex; align-items: center; gap: 12px; color: var(--muted); }
+.steps .dot { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; }
+.steps li.done { color: var(--ink); }
+.steps li.done .dot { background: var(--good); border-color: var(--good); }
+.steps li.done .dot::after { content: ""; width: 6px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: translateY(-1px) rotate(45deg); }
+.steps li.now .dot { border-color: var(--accent); border-top-color: transparent; }
+@media (prefers-reduced-motion: no-preference) {
+  .steps li.now .dot { animation: spin 700ms linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+}
+
+/* Fiche */
+.niche-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.4rem;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  margin: 0;
+  text-wrap: balance;
+  outline: none;
+}
+.sec { border-top: 1px solid var(--line); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.sec p { margin: 0; max-width: 62ch; }
+.sec ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 6px; max-width: 62ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 5px 10px; font-size: 14px; }
+.chip.mono { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
+.gauges { display: flex; flex-direction: column; gap: 10px; }
+.gauge { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.g-label { color: var(--muted); }
+.g-val { display: flex; align-items: center; gap: 10px; }
+.g-val b { min-width: 5.2em; text-align: right; font-weight: 600; }
+.segs { display: flex; gap: 4px; }
+.segs i { display: block; width: 26px; height: 8px; border-radius: 2px; background: var(--line); }
+.segs i.good { background: var(--good); }
+.segs i.warn { background: var(--warn); }
+.segs i.bad { background: var(--bad); }
+b.good { color: var(--good); }
+b.warn { color: var(--warn); }
+b.bad { color: var(--bad); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.card p { margin: 0; max-width: 62ch; }
+p.small, span.small { font-size: 14px; color: var(--muted); }
+.stat-row { display: flex; flex-wrap: wrap; gap: 10px 22px; }
+.stat { display: flex; flex-direction: column; }
+.stat b { font-family: var(--font-display); font-size: 1.7rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: var(--muted); max-width: 14rem; }
+
+/* Verrouillé */
+.locked { display: flex; flex-direction: column; gap: 10px; }
+.locked-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; }
+.locked-row svg { flex: none; width: 20px; height: 20px; color: var(--muted); }
+.bars { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.bars i { display: block; height: 9px; border-radius: 5px; background: var(--line); }
+.bars i:nth-child(1) { width: 88%; }
+.bars i:nth-child(2) { width: 56%; }
+.locked-row .tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); flex: none; }
+.incl { list-style: none; padding: 0 !important; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.incl li { display: flex; gap: 10px; align-items: flex-start; }
+.incl li::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: 8px; border-radius: 2px; background: var(--accent); }
+
+.paywall { border: 1.5px solid var(--accent); border-radius: 14px; background: var(--surface); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.price { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.price b { font-family: var(--font-display); font-size: 2.1rem; line-height: 1; }
+.price span { color: var(--muted); font-size: 14px; }
+.demo { align-self: flex-start; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); }
+
+/* Coach */
+.coach-head { display: flex; align-items: center; gap: 14px; }
+.coach-head > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+.tab { flex: none; appearance: none; font: inherit; font-weight: 600; font-size: 14px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.panel { display: flex; flex-direction: column; gap: 16px; }
+.plan { display: grid; grid-template-columns: 3.4rem 1fr; gap: 12px 12px; margin: 0; }
+.plan dt { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--accent); padding-top: 3px; }
+.plan dd { margin: 0; max-width: 58ch; }
+.plan dd.rest { color: var(--muted); }
+.plan dd.review { font-weight: 600; }
+.idea { display: flex; flex-direction: column; gap: 8px; }
+.idea h4 { margin: 0; font-family: var(--font-display); font-size: 1.08rem; line-height: 1.25; font-weight: 700; text-wrap: balance; }
+.idea .meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.idea .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.chk { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.chk input { flex: none; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); }
+.chk span { min-width: 0; }
+.track { display: grid; grid-template-columns: 2.4rem repeat(3, minmax(0, 1fr)); gap: 8px; align-items: center; }
+.track .hd { font-size: 12px; color: var(--muted); }
+.field { width: 100%; min-width: 0; min-height: 40px; font: inherit; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+.num { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.sources { font-size: 14px; color: var(--muted); }
+.sources ul { margin: 6px 0 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 4px; }
+textarea.copybox { width: 100%; min-height: 6rem; font: 13px/1.45 var(--font-mono); color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Mise en avant : héro, scores, chiffres clés, aperçu flouté, offre */
+.hero { position: relative; overflow: hidden; border-radius: 18px; padding: 20px; color: #FFFFFF; background: linear-gradient(135deg, #2B44F5 0%, #7F3CF0 62%, #E03C8A 130%); display: flex; flex-direction: column; gap: 12px; }
+.hero::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px); background-size: 14px 14px; pointer-events: none; }
+.hero > * { position: relative; z-index: 1; }
+.hero .eyebrow { color: rgba(255, 255, 255, 0.82); }
+.hero .niche-name { color: #FFFFFF; font-size: 2.6rem; }
+.hero .tile { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35); }
+.hero .demo { background: rgba(255, 255, 255, 0.2); color: #FFFFFF; }
+.hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { background: rgba(255, 255, 255, 0.2); border-radius: 999px; padding: 5px 12px; font-size: 14px; font-weight: 500; }
+.scores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.score { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.score .lbl { font-size: 12px; color: var(--muted); line-height: 1.2; }
+.score b { font-family: var(--font-display); font-size: 1.15rem; line-height: 1.1; }
+.segs.wide { width: 100%; }
+.segs.wide i { flex: 1; width: auto; }
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.kpi b { font-family: var(--font-display); font-weight: 800; font-size: 2.5rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.kpi span { font-size: 14px; color: var(--muted); }
+.teasers { display: flex; flex-direction: column; gap: 10px; }
+.teaser { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 14px; min-height: 72px; display: flex; align-items: center; }
+.teaser .blur { filter: blur(5px); user-select: none; flex: 1; min-width: 0; padding-right: 7rem; }
+.teaser .blur b { display: block; font-family: var(--font-display); }
+.teaser .blur span { font-size: 14px; color: var(--muted); }
+.lockbadge { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 6px; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; }
+.lockbadge svg { width: 16px; height: 16px; }
+.paywall { border: 0; color: #FFFFFF; background: linear-gradient(160deg, #1B2160 0%, #4A2BB8 100%); box-shadow: 0 18px 40px -18px rgba(43, 68, 245, 0.7); }
+.paywall h3 { color: #FFFFFF; font-size: 1.6rem; }
+.paywall .price b { color: #FFFFFF; font-size: 2.8rem; }
+.paywall .price span, .paywall .small { color: rgba(255, 255, 255, 0.78); }
+.paywall .demo { background: rgba(255, 255, 255, 0.16); color: #FFFFFF; }
+.paywall .incl li::before { content: "✓"; background: none; width: auto; height: auto; margin-top: 0; color: #5EE3A8; font-weight: 700; }
+.btn.cta { background: #FFFFFF; color: #1B2160; border-color: #FFFFFF; min-height: 56px; font-size: 17px; width: 100%; }
+.btn.cta:focus-visible { outline-color: #FFFFFF; }
+.cta-bar { position: sticky; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; box-shadow: 0 12px 32px -10px rgba(10, 14, 40, 0.5); }
+.cta-bar div { min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.cta-bar b { font-family: var(--font-display); }
+.cta-bar span { font-size: 13px; color: var(--muted); }
+.hours { display: flex; flex-wrap: wrap; gap: 8px; }
+.hours span { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; padding: 8px 14px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.day { appearance: none; font: inherit; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px; min-height: 56px; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; }
+.day b { font-family: var(--font-display); font-size: 15px; }
+.day small { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+.day.post { background: linear-gradient(135deg, #4D7CFF, #2B44F5); border-color: transparent; color: #FFFFFF; }
+.day.post small { color: rgba(255, 255, 255, 0.85); }
+.day.sel { outline: 3px solid var(--accent); outline-offset: 2px; }
+.day:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.day-detail h4 { margin: 0; font-family: var(--font-display); font-size: 1.1rem; line-height: 1.25; text-wrap: balance; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 6px; vertical-align: -1px; background: var(--surface); border: 1.5px solid var(--line); }
+.legend i.p { background: linear-gradient(135deg, #4D7CFF, #2B44F5); border-color: transparent; }
+
+/* Missions guidées et chat */
+.daybar { display: flex; flex-direction: column; gap: 10px; }
+.daybig { font-family: var(--font-display); font-weight: 800; font-size: 2.3rem; line-height: 1; letter-spacing: -0.02em; margin: 0; }
+.dots { display: flex; gap: 5px; }
+.dots i { flex: 1; height: 8px; border-radius: 4px; background: var(--line); }
+.dots i.done { background: var(--good); }
+.dots i.now { background: var(--accent); }
+.step { gap: 10px; }
+.step.done { background: var(--accent-soft); }
+.step-head { display: flex; align-items: center; gap: 10px; }
+.step-head h4 { margin: 0; font-family: var(--font-display); font-size: 1.1rem; line-height: 1.2; }
+.stepnum { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.step.done .stepnum { background: var(--good); color: #FFFFFF; }
+.stepbig { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; line-height: 1.25; text-wrap: balance; margin: 0; }
+.step-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.stepcheck { display: flex; align-items: center; gap: 8px; min-height: 40px; font-weight: 600; cursor: pointer; margin-left: auto; }
+.stepcheck input { width: 22px; height: 22px; accent-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.helpcard { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.helpcard p { margin: 0; font-weight: 600; max-width: 22rem; }
+.chat { display: flex; flex-direction: column; gap: 10px; }
+.bubble { max-width: 92%; padding: 10px 14px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble.u { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-bottom-right-radius: 4px; }
+.bubble.a { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+.bubble.pending { color: var(--muted); }
+.bubble.err { border-color: var(--bad); }
+.quick { display: flex; flex-wrap: wrap; gap: 8px; }
+.chatform { display: flex; gap: 8px; align-items: flex-end; }
+.chatform textarea { flex: 1; min-width: 0; min-height: 48px; max-height: 9rem; resize: vertical; font: inherit; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.chatform textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Offre, plans, FAQ et étapes guidées */
+.nowtag { margin: 0; align-self: flex-start; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border-radius: 5px; background: var(--accent); color: var(--accent-ink); }
+.step.now { border: 2px solid var(--accent); box-shadow: 0 14px 34px -18px rgba(43, 68, 245, 0.6); }
+.step-head .mins { margin-left: auto; flex: none; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.why { margin: 0; font-size: 14px; color: var(--muted); }
+.how { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 6px; max-width: 60ch; }
+.how li::marker { color: var(--accent); font-weight: 700; }
+.step-mini { flex-direction: row; align-items: center; gap: 12px; padding: 12px 14px; }
+.step-mini .t { flex: 1; min-width: 0; font-weight: 600; }
+.step-mini.later { background: transparent; border-style: dashed; color: var(--muted); }
+.step-mini.later .stepnum { background: var(--line); color: var(--muted); }
+.step-mini.done .stepnum { background: var(--good); color: #FFFFFF; }
+.step-mini .mins { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.flash { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+.askai { appearance: none; background: none; border: 0; padding: 6px 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.bigbtn { width: 100%; min-height: 54px; font-size: 17px; }
+
+.preview-rows { display: flex; flex-direction: column; gap: 8px; }
+.preview-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.preview-row .lr-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.preview-row .lr-text b { font-family: var(--font-display); }
+.preview-row .lr-text span { font-size: 13px; color: var(--muted); }
+.preview-row svg { flex: none; width: 18px; height: 18px; color: var(--muted); }
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cmp { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--surface); display: flex; flex-direction: column; gap: 10px; }
+.cmp h4 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; }
+.cmp ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.cmp li { display: flex; gap: 8px; }
+.cmp.no { color: var(--muted); }
+.cmp.no li::before { content: "✕"; color: var(--bad); font-weight: 700; flex: none; }
+.cmp.yes { border: 2px solid var(--accent); }
+.cmp.yes li::before { content: "✓"; color: var(--good); font-weight: 700; flex: none; }
+.plans { display: flex; flex-direction: column; gap: 12px; }
+.pricecard { position: relative; display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--surface); border: 2px solid var(--line); border-radius: 16px; cursor: pointer; }
+.pricecard.sel { border-color: var(--accent); background: var(--accent-soft); }
+.pricecard.best { padding-top: 22px; }
+.pricecard input { flex: none; width: 22px; height: 22px; accent-color: var(--accent); }
+.pricecard .pc-body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.pricecard .pc-name { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
+.pricecard .pc-note { font-size: 13px; color: var(--muted); }
+.pricecard .pc-price { text-align: right; display: flex; flex-direction: column; line-height: 1.1; }
+.pricecard .pc-price b { font-family: var(--font-display); font-size: 1.8rem; }
+.pricecard .pc-price span { font-size: 13px; color: var(--muted); }
+.ribbon { position: absolute; top: -11px; left: 16px; background: linear-gradient(135deg, #FFB54A, #F4743B); color: #1B1205; font-weight: 700; font-size: 12px; padding: 3px 10px; border-radius: 999px; }
+.faq { display: flex; flex-direction: column; gap: 8px; }
+.faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.faq p { margin: 8px 0 0; color: var(--muted); font-size: 15px; max-width: 60ch; }
+
+@media (max-width: 420px) {
+  h1 { font-size: 1.75rem; }
+  .niche-name { font-size: 2rem; }
+  .plan { grid-template-columns: 3rem 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  main > * { animation: rise 220ms ease-out both; }
+  @keyframes rise { from { opacity: 0.001; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+  .weeks{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .weeks li{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface,var(--bg))}
+  .weeks .wk{flex:none;min-width:38px;text-align:center;font:600 13px/1 "IBM Plex Mono",monospace;padding:8px 6px;border-radius:10px;background:var(--accent);color:var(--accent-ink)}
+  .weeks b{display:block}
+  .weeks span:not(.wk){color:var(--muted);font-size:14px}
+
+.bigstats { display: grid; gap: 10px; }
+.bigstat { border-radius: 16px; padding: 16px; color: #fff; display: flex; flex-direction: column; gap: 4px; }
+.bigstat b { font-family: var(--font-display); font-size: 34px; line-height: 1.05; }
+.bigstat span { font-size: 14px; opacity: .95; }
+.bigstat.s1 { background: linear-gradient(135deg, #2B44F5, #7F3CF0); }
+.bigstat.s2 { background: linear-gradient(135deg, #0E9F6E, #1AA6C9); }
+.bigstat.s3 { background: linear-gradient(135deg, #E8731A, #E03C8A); }
+.targets { list-style: none; padding: 0 !important; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.targets li { display: flex; gap: 12px; align-items: baseline; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.targets .dd { flex: none; font: 600 12px/1 var(--font-mono); background: var(--accent); color: var(--accent-ink); border-radius: 8px; padding: 6px 8px; }
+.calc { display: flex; flex-direction: column; gap: 2px; padding: 12px; border: 1px dashed var(--line); border-radius: 12px; }
+.calc span { font-size: 14px; color: var(--muted); }
+.sec.tone-a, .sec.tone-b, .sec.tone-c, .sec.tone-d { border-top: 0; border-radius: 18px; padding: 16px; }
+.sec.tone-a { background: var(--tint-a); }
+.sec.tone-b { background: var(--tint-b); }
+.sec.tone-c { background: var(--tint-c); }
+.sec.tone-d { background: var(--tint-d); }
+.lockedrow { position: relative; }
+.lockedrow svg { width: 20px; height: 20px; flex: none; color: var(--muted); margin-left: auto; }
+.lockedrow.blur .lr-text { filter: blur(3.5px); user-select: none; }
+.weeks li.lockedrow { align-items: center; }
+.weeks li.lockedrow div { flex: 1; filter: blur(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Prototype</p>
+    <h1>Boussole Niche</h1>
+    <p class="lede" id="lede">Huit questions, une niche de départ et un plan de 60 jours jusqu'à tes deux premiers produits. Aucune promesse de vues ni de revenus.</p>
+  </header>
+  <div id="progress-slot"></div>
+  <main id="app" aria-live="polite"></main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Questions ---------- */
+  var QUESTIONS = [
+    { id: "goal", title: "Quel est ton objectif avec TikTok ?", hint: "Choisis ce qui compte le plus pour les 60 prochains jours.",
+      options: [
+        { v: "audience", t: "Faire grossir mon audience" },
+        { v: "revenus", t: "Gagner mes premiers revenus" },
+        { v: "vendre", t: "Vendre mes produits" }
+      ] },
+    { id: "level", title: "Où en es-tu aujourd'hui ?", hint: "Ça change le point de départ du plan.",
+      options: [
+        { v: "debut", t: "Je débute, je veux me lancer" },
+        { v: "poste", t: "Je publie déjà du contenu" }
+      ] },
+    { id: "format", title: "Quel type de vidéo veux-tu faire ?", hint: "Tu peux rester anonyme, beaucoup de comptes marchent sans visage.",
+      options: [
+        { v: "ecran", t: "Sans visage : capture d'écran, texte à l'écran" },
+        { v: "voix", t: "Sans visage : ma voix sur des images" },
+        { v: "visage", t: "Je veux bien apparaître à l'écran" }
+      ] },
+    { id: "time", title: "Combien de temps peux-tu y consacrer par semaine ?", hint: "Compte environ 50 minutes par vidéo, de l'idée à la publication. Ton rythme en dépend.",
+      options: [
+        { v: "t1", t: "Entre 2 et 3 heures" },
+        { v: "t2", t: "Entre 4 et 5 heures" },
+        { v: "t3", t: "6 heures ou plus" }
+      ] },
+    { id: "platforms", title: "Où veux-tu publier ?", hint: "Une même vidéo peut servir sur plusieurs plateformes.",
+      options: [
+        { v: "p1", t: "TikTok seulement" },
+        { v: "p2", t: "TikTok, Instagram Reels et YouTube Shorts" }
+      ] },
+    { id: "block", title: "Quel est ton plus gros blocage ?", hint: "Une seule réponse, la plus frustrante.",
+      options: [
+        { v: "idees", t: "Je manque d'idées" },
+        { v: "temps", t: "Je n'ai pas le temps de créer" },
+        { v: "decolle", t: "Ça ne décolle pas" },
+        { v: "monet", t: "Je ne sais pas comment monétiser" }
+      ] },
+    { id: "theme", title: "Quel thème t'intéresse le plus ?", hint: "Prends celui dont tu peux parler pendant 10 vidéos sans te forcer.", grid: true,
+      options: [
+        { v: "finance", t: "Finance perso" },
+        { v: "langues", t: "Langues" },
+        { v: "foot", t: "Foot" },
+        { v: "gaming", t: "Gaming" },
+        { v: "perso", t: "Développement perso" },
+        { v: "bienetre", t: "Bien-être et fitness" },
+        { v: "cuisine", t: "Cuisine" },
+        { v: "tech", t: "Tech et outils IA" },
+        { v: "metiers", t: "Bricolage et métiers" },
+        { v: "business", t: "Business et freelance" },
+        { v: "voyage", t: "Voyage" },
+        { v: "beaute", t: "Beauté et soin" },
+        { v: "unsure", t: "Je ne sais pas encore" }
+      ] }
+  ];
+  var TOTAL = QUESTIONS.length + 1;
+
+  /* ---------- Icônes ---------- */
+  var TILES = {
+    audience: { c: "t-cyan", p: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.1 4.5 1.8 4.5 4.8"/>' },
+    revenus: { c: "t-orange", p: '<circle cx="12" cy="12" r="8.5"/><path d="M14.5 9.5c-.5-.9-1.4-1.4-2.6-1.4-1.5 0-2.5.8-2.5 1.9 0 2.7 5.4 1.3 5.4 4 0 1.1-1.1 2-2.8 2-1.3 0-2.3-.6-2.8-1.6M12 6.5v1.6M12 16v1.5"/>' },
+    vendre: { c: "t-violet", p: '<path d="M5.5 8h13l-1 11.5h-11z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/>' },
+    debut: { c: "t-green", p: '<circle cx="12" cy="12" r="8.5"/><path d="M10.5 8.8l5 3.2-5 3.2z"/>' },
+    poste: { c: "t-blue", p: '<path d="M5 19v-7M12 19V6M19 19v-9"/>' },
+    ecran: { c: "t-blue", p: '<rect x="3.5" y="5" width="17" height="11.5" rx="2"/><path d="M9 20h6M12 16.5V20"/>' },
+    voix: { c: "t-pink", p: '<rect x="9" y="3.5" width="6" height="10.5" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/>' },
+    visage: { c: "t-orange", p: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 14c.9 1.3 2 2 3.5 2s2.6-.7 3.5-2M9 9.5h.01M15 9.5h.01"/>' },
+    t1: { c: "t-cyan", p: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' },
+    t2: { c: "t-blue", p: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' },
+    t3: { c: "t-violet", p: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' },
+    p1: { c: "t-pink", p: '<rect x="7" y="3.5" width="10" height="17" rx="2.5"/><path d="M11 17.5h2"/>' },
+    p2: { c: "t-green", p: '<path d="M12 4l8.5 4.5L12 13 3.5 8.5z"/><path d="M3.5 12.5L12 17l8.5-4.5"/>' },
+    idees: { c: "t-orange", p: '<path d="M9.5 17.5h5M10 20.5h4"/><path d="M12 3.5a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6v.5h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 12 3.5z"/>' },
+    temps: { c: "t-cyan", p: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' },
+    decolle: { c: "t-pink", p: '<path d="M4 16.5l5-5 3.5 3.5L20 7.5"/><path d="M15 7.5h5v5"/>' },
+    monet: { c: "t-violet", p: '<circle cx="12" cy="12" r="8.5"/><path d="M14.5 9.5c-.5-.9-1.4-1.4-2.6-1.4-1.5 0-2.5.8-2.5 1.9 0 2.7 5.4 1.3 5.4 4 0 1.1-1.1 2-2.8 2-1.3 0-2.3-.6-2.8-1.6"/>' },
+    finance: { c: "t-green", p: '<rect x="3.5" y="6.5" width="17" height="12" rx="2.5"/><path d="M3.5 10.5h17M15.5 14.5h2"/>' },
+    langues: { c: "t-cyan", p: '<path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-7l-4 3.5V16.5H5A1.5 1.5 0 0 1 3.5 15V7A1.5 1.5 0 0 1 5 5.5z"/>' },
+    foot: { c: "t-green", p: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8.5l3.2 2.3-1.2 3.7h-4l-1.2-3.7z"/><path d="M12 8.5v-5M15.2 10.8l4.3-1.4M14 14.5l2.7 3.6M10 14.5l-2.7 3.6M8.8 10.8L4.5 9.4"/>' },
+    gaming: { c: "t-violet", p: '<rect x="3" y="8" width="18" height="9" rx="4.5"/><path d="M8 10.5v4M6 12.5h4M15.5 11.5h.01M17.5 13.5h.01"/>' },
+    perso: { c: "t-green", p: '<path d="M12 20v-8"/><path d="M12 12c0-3.5-2.5-5.5-6.5-5.5 0 3.5 2.5 5.5 6.5 5.5z"/><path d="M12 14c0-3 2-5 6-5 0 3-2 5-6 5z"/>' },
+    bienetre: { c: "t-pink", p: '<path d="M12 19.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10z"/>' },
+    cuisine: { c: "t-orange", p: '<path d="M7 3.5v7.5M4.5 3.5V9a2.5 2.5 0 0 0 5 0V3.5M7 11v9.5"/><path d="M17 20.5V3.5c-2.2 1.2-3.5 3.5-3.5 6.5 0 1.8.8 3 3.5 3.2"/>' },
+    tech: { c: "t-violet", p: '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/><path d="M9.5 3.5v3M14.5 3.5v3M9.5 17.5v3M14.5 17.5v3M3.5 9.5h3M3.5 14.5h3M17.5 9.5h3M17.5 14.5h3"/>' },
+    metiers: { c: "t-blue", p: '<path d="M15.5 5a4 4 0 0 0-4.8 5.2L4.5 16.5a2 2 0 0 0 3 3l6.3-6.2A4 4 0 0 0 19 8.5l-2.6 2.5-2.4-.6-.6-2.4z"/>' },
+    business: { c: "t-blue", p: '<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5M3.5 13h17"/>' },
+    voyage: { c: "t-cyan", p: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.5 3.5 5.3 3.5 8.5s-1 6-3.5 8.5c-2.5-2.5-3.5-5.3-3.5-8.5s1-6 3.5-8.5z"/>' },
+    beaute: { c: "t-pink", p: '<path d="M12 4l1.8 5.2L19 11l-5.2 1.8L12 18l-1.8-5.2L5 11l5.2-1.8z"/>' },
+    unsure: { c: "t-violet", p: '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>' }
+  };
+  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>';
+
+  var SUBS = {
+    audience: "des abonnés qui reviennent",
+    revenus: "en vendant un petit produit à ton public",
+    vendre: "ton produit ou ton service",
+    t1: "environ 3 vidéos par semaine",
+    t2: "environ 5 vidéos par semaine",
+    t3: "jusqu'à 7 vidéos par semaine",
+    unsure: "on commence par une niche simple"
+  };
+
+  /* ---------- Niches ----------
+     comp : 1 faible, 2 moyenne, 3 forte. faceless et monet : 1 faible, 3 élevé.
+     Niveaux qualitatifs estimés à partir d'articles et de classements de tendances de 2026. */
+  var NICHES = {
+    finance: {
+      name: "Finance perso", comp: 3, faceless: 3, monet: 3, tags: ["#financeperso", "#budget"],
+      note: "Les annonceurs paient cher pour cette audience, donc la demande est solide. Beaucoup de créateurs y sont déjà.",
+      format: "capture d'écran de ton tableau de budget, texte à l'écran, voix off ou musique.",
+      product: "un modèle de budget (tableur) avec un mini-guide en PDF.",
+      angles: [
+        { n: "Budget pour étudiants", kw: "budget étudiant", tag: "#budgetetudiant", ideas: ["Où part vraiment l'argent d'un étudiant en un mois", "Mon budget d'étudiant avec 800 € par mois, ligne par ligne", "3 dépenses invisibles qui vident ton compte d'étudiant"] },
+        { n: "Rembourser une dette sans se priver", kw: "rembourser une dette", tag: "#dettes", ideas: ["La méthode boule de neige pour rembourser ses dettes", "Combien de temps pour rembourser 3 000 € à 100 € par mois", "Ce que j'ai arrêté d'acheter pour rembourser plus vite"] },
+        { n: "Mettre de côté avec un petit salaire", kw: "épargner petit salaire", tag: "#epargne", ideas: ["Mettre 50 € de côté chaque mois, même avec un petit salaire", "La règle des 3 enveloppes expliquée en 30 secondes", "Mon virement automatique du jour de paie"] }
+      ]
+    },
+    langues: {
+      name: "Langues", comp: 3, faceless: 3, monet: 2, tags: ["#apprendrelanglais", "#languesvivantes"],
+      note: "L'apprentissage des langues fait partie des niches de formation les plus rentables. Pour sortir du lot, choisis une langue et un public précis.",
+      format: "texte à l'écran sur des clips de fond : une expression, sa traduction, le piège à éviter.",
+      product: "un défi de 30 jours en PDF, une expression par jour avec des exercices.",
+      angles: [
+        { n: "Anglais pour le travail", kw: "anglais professionnel", tag: "#anglaispro", ideas: ["L'erreur d'anglais qui fait tiquer en réunion", "3 phrases pour finir un email en anglais", "Comment dire « je reviens vers toi » en anglais au bureau"] },
+        { n: "Espagnol pour voyager", kw: "espagnol voyage", tag: "#espagnolvoyage", ideas: ["Commander au restaurant en espagnol, phrase par phrase", "5 mots d'espagnol à connaître avant de partir", "La phrase pour demander son chemin sans stress"] },
+        { n: "Les expressions que les manuels n'enseignent pas", kw: "expressions anglais", tag: "#expressionsanglais", ideas: ["3 expressions anglaises que les natifs utilisent tout le temps", "Ce faux ami ne veut pas dire ce que tu crois", "Dis-le comme un natif : 3 façons de dire « je suis fatigué »"] }
+      ]
+    },
+    foot: {
+      name: "Foot", comp: 3, faceless: 3, monet: 2, tags: ["#foot", "#footballtiktok"],
+      note: "Une audience énorme et très active, mais très concurrentielle. Les statistiques, les schémas et les anecdotes se font bien sans visage. Évite les extraits de matchs, souvent protégés par des droits, et n'invente jamais d'interview ni de citation d'un joueur réel.",
+      format: "graphiques de stats, schémas tactiques et texte à l'écran, avec ta voix ou de la musique.",
+      product: "un guide en PDF des statistiques à suivre pour une saison, ou un quiz de culture foot.",
+      angles: [
+        { n: "Stats et classements", kw: "stats foot", tag: "#statsfoot", ideas: ["Le classement des meilleurs buteurs de la saison, mais par minutes jouées", "3 chiffres qui racontent le début de saison de ton club", "Le joueur le plus sous-coté du championnat, chiffres à l'appui"] },
+        { n: "Analyse tactique simple", kw: "tactique foot", tag: "#tactiquefoot", ideas: ["Pourquoi cette équipe presse aussi haut, expliqué en 40 secondes", "Le système de jeu de ton équipe, schéma à l'appui", "Pourquoi ce but est arrivé : l'action décomposée en 3 images"] },
+        { n: "Histoire et anecdotes", kw: "histoire du foot", tag: "#histoiredufoot", ideas: ["La remontada la plus folle de l'histoire de ton club", "Le transfert que personne n'avait vu venir", "Le record du foot que presque personne ne connaît"] }
+      ]
+    },
+    gaming: {
+      name: "Gaming", comp: 3, faceless: 3, monet: 2, tags: ["#gaming", "#gamingtiktok"],
+      note: "Le gaming fait partie des niches avec la plus grande portée, mais la concurrence est forte. Choisis un seul jeu ou un seul type de contenu pour te distinguer.",
+      format: "capture de jeu avec texte à l'écran, ou voix off par-dessus tes parties.",
+      product: "un guide de réglages et d'astuces pour un jeu précis, en PDF.",
+      angles: [
+        { n: "Astuces et guides", kw: "astuces jeu", tag: "#gamingtips", ideas: ["L'astuce que personne ne t'a montrée dans ce jeu", "3 réglages à changer dès maintenant", "Comment passer ce boss du premier coup"] },
+        { n: "Nouveautés et sorties", kw: "sorties jeux", tag: "#sortiejeu", ideas: ["Les jeux qui sortent ce mois-ci en 30 secondes", "Ce jeu gratuit mérite ton temps", "Le trailer expliqué en une minute"] },
+        { n: "Rétro et nostalgie", kw: "jeux rétro", tag: "#retrogaming", ideas: ["Le jeu de ton enfance que tu avais oublié", "Le détail caché de cette vieille console", "Les secrets d'un classique que tu as sûrement raté"] }
+      ]
+    },
+    perso: {
+      name: "Développement personnel", comp: 3, faceless: 2, monet: 2, tags: ["#developpementpersonnel", "#habitudes"],
+      note: "Niche très encombrée. Sans angle précis, tu te noies parmi des milliers de comptes similaires.",
+      format: "texte à l'écran sur des clips de fond, ou voix off sur des plans de ton quotidien.",
+      product: "un carnet de suivi d'habitudes à imprimer, en PDF.",
+      angles: [
+        { n: "Une routine du matin réaliste", kw: "routine du matin", tag: "#routinedumatin", ideas: ["Pourquoi ta routine du matin ne tient pas", "Ma routine du matin en 15 minutes, sans réveil à 5 h", "Une seule habitude à ajouter ce matin"] },
+        { n: "Arrêter de procrastiner", kw: "procrastination", tag: "#procrastination", ideas: ["La règle des 2 minutes pour commencer ce que tu repousses", "Pourquoi tu procrastines, et ce qui aide vraiment", "3 questions à te poser quand tu n'arrives pas à t'y mettre"] },
+        { n: "Habitudes pour étudiants", kw: "habitudes étudiant", tag: "#habitudesetudiant", ideas: ["L'organisation de ma semaine d'étudiant en 1 minute", "Une habitude de révision qui prend 10 minutes", "Mon suivi d'habitudes sur 30 jours"] }
+      ]
+    },
+    bienetre: {
+      name: "Bien-être et fitness", comp: 3, faceless: 1, monet: 3, tags: ["#bienetre", "#fitness"],
+      note: "La demande est forte, mais un exercice se montre. Sans visage, il faut des clips ou des animations, donc c'est plus long à produire. Reste sur des conseils généraux et ne fais pas de promesse de santé.",
+      format: "voix off sur des clips d'exercices ou des plans de mains, avec les consignes à l'écran.",
+      product: "un programme de séances en PDF, à petit prix.",
+      angles: [
+        { n: "Étirements de bureau", kw: "étirements bureau", tag: "#etirements", ideas: ["5 étirements à faire à ton bureau", "Mal au dos devant l'ordi : 3 mouvements d'une minute", "Les étirements du soir avant de dormir"] },
+        { n: "Séances à la maison sans matériel", kw: "sport à la maison", tag: "#sportmaison", ideas: ["Une séance de 10 minutes sans matériel", "Le programme d'une semaine sans salle de sport", "L'erreur de forme à éviter sur les pompes"] },
+        { n: "Sommeil et récupération", kw: "mieux dormir", tag: "#sommeil", ideas: ["Ma routine du soir pour mieux dormir", "3 habitudes qui abîment ton sommeil", "Ce que j'ai changé dans ma chambre pour mieux dormir"] }
+      ]
+    },
+    cuisine: {
+      name: "Cuisine", comp: 2, faceless: 2, monet: 2, tags: ["#cuisine", "#recettefacile"],
+      note: "Un créateur français de recettes anti-gaspi figure dans la liste « Discover » 2026 de TikTok, avec plus d'un million d'abonnés. L'intérêt du public existe.",
+      format: "plans de mains sur le plan de travail, texte à l'écran pour les quantités.",
+      product: "un livret de recettes avec la liste de courses, en PDF.",
+      angles: [
+        { n: "Recettes anti-gaspi", kw: "recette anti-gaspi", tag: "#antigaspi", ideas: ["Ce que je cuisine avec les restes du frigo", "La recette qui sauve le pain rassis", "3 légumes fatigués sauvés en 10 minutes"] },
+        { n: "Repas à moins de 3 €", kw: "repas pas cher", tag: "#repaspascher", ideas: ["Un repas complet à moins de 3 €", "Mes courses de la semaine, ticket à l'appui", "Le plat pas cher que je mange chaque semaine"] },
+        { n: "Les repas de la semaine en 1 heure", kw: "meal prep", tag: "#mealprep", ideas: ["Les repas de la semaine préparés en 1 heure", "Ma liste de courses pour 5 repas", "Le meal prep pour ceux qui détestent cuisiner"] }
+      ]
+    },
+    tech: {
+      name: "Tech et outils IA", comp: 2, faceless: 3, monet: 3, tags: ["#outilsia", "#astucetech"],
+      note: "Les contenus sur l'IA du quotidien restent porteurs, avec des possibilités d'affiliation sur les outils. Ne montre que des résultats que tu as vraiment obtenus.",
+      format: "capture d'écran de l'outil en action, avec le résultat à l'écran.",
+      product: "un guide en PDF de prompts prêts à copier.",
+      angles: [
+        { n: "Outils IA gratuits pour étudiants", kw: "outil IA gratuit", tag: "#outilgratuit", ideas: ["Cet outil gratuit fait en 10 secondes ce qui me prenait 1 heure", "3 outils IA gratuits pour réviser", "Mon prompt pour résumer un cours"] },
+        { n: "L'IA pour gérer son budget", kw: "IA budget", tag: "#iabudget", ideas: ["J'ai demandé à l'IA de classer mes dépenses", "Un prompt pour préparer ton budget du mois", "Comment retrouver tes abonnements oubliés avec un outil gratuit"] },
+        { n: "Automatiser une tâche répétitive", kw: "automatiser", tag: "#automatisation", ideas: ["Cette tâche répétitive se fait toute seule maintenant", "Mon automatisation du lundi matin", "Avant et après : ma liste de tâches avec l'IA"] }
+      ]
+    },
+    metiers: {
+      name: "Bricolage et métiers manuels", comp: 1, faceless: 2, monet: 2, tags: ["#bricolage", "#metiermanuel"],
+      note: "Les artisans qui montrent leur chantier forment l'une des niches les moins servies et à la croissance la plus rapide, d'après une analyse de début 2026. Pour l'électricité, rappelle toujours de couper le courant.",
+      format: "plans de mains et de chantier, voix off ou texte à l'écran.",
+      product: "une checklist de petits travaux en PDF, ou un guide d'outils.",
+      angles: [
+        { n: "Électricité de base", kw: "électricité", tag: "#electricite", ideas: ["Changer une prise en toute sécurité, en 2 minutes", "Les 3 outils d'électricien à avoir chez soi", "L'erreur de débutant sur un interrupteur"] },
+        { n: "Petits travaux d'appartement", kw: "petits travaux", tag: "#petitstravaux", ideas: ["Percer un mur sans abîmer le plâtre", "L'outil à 10 € qui m'a le plus servi", "Avant et après d'un petit chantier"] },
+        { n: "Une journée dans un métier du bâtiment", kw: "métier du bâtiment", tag: "#metierdubatiment", ideas: ["Ce que fait vraiment un électricien sur une journée", "Les outils que j'ai dans mon camion", "Mon premier chantier, ce que j'ai appris"] }
+      ]
+    },
+    business: {
+      name: "Business et freelance", comp: 3, faceless: 2, monet: 3, tags: ["#freelance", "#entrepreneur"],
+      note: "La niche « gagner de l'argent » est la plus encombrée. Sans angle très précis, ça ne décolle presque jamais.",
+      format: "capture d'écran et texte à l'écran, avec des résultats concrets.",
+      product: "des modèles de documents (devis, messages) en PDF.",
+      angles: [
+        { n: "Trouver son premier client en freelance", kw: "premier client freelance", tag: "#premierclient", ideas: ["Mon message type pour décrocher un premier client", "Combien facturer une première mission", "L'erreur qui m'a fait perdre un client"] },
+        { n: "Lancer un petit commerce local", kw: "petit commerce", tag: "#petitcommerce", ideas: ["Les 3 premières choses à faire avant d'ouvrir", "Ce qu'un petit commerce doit mettre en ligne en premier", "Comment je trouve mes premiers clients dans mon quartier"] },
+        { n: "Un métier précis, un client précis", kw: "freelance spécialisé", tag: "#freelancespecialise", ideas: ["Pourquoi je me suis spécialisé dans un seul type de client", "Comment j'ai choisi ma spécialité", "Mon offre en une phrase"] }
+      ]
+    },
+    voyage: {
+      name: "Voyage", comp: 2, faceless: 2, monet: 2, tags: ["#voyage", "#bonsplansvoyage"],
+      note: "Une niche visuelle qui se prête bien aux listes et aux itinéraires. Les contenus utiles (budget, itinéraire, erreurs à éviter) fonctionnent mieux que les simples jolies images.",
+      format: "clips de lieux avec texte à l'écran, itinéraire et budget affichés.",
+      product: "un itinéraire détaillé avec budget, en PDF.",
+      angles: [
+        { n: "Voyager pas cher", kw: "voyage pas cher", tag: "#voyagepascher", ideas: ["Un week-end dans ta ville préférée pour moins de 200 €, le détail", "Comment je trouve des billets moins chers", "Les frais cachés d'un voyage, à anticiper"] },
+        { n: "Week-ends en France", kw: "week-end en France", tag: "#weekendfrance", ideas: ["Un week-end près de chez toi, itinéraire en 3 étapes", "3 villes françaises sous-estimées pour un week-end", "Mon itinéraire de 48 heures"] },
+        { n: "Erreurs de voyageur", kw: "conseils voyage", tag: "#conseilsvoyage", ideas: ["L'erreur que je ne referai plus en voyage", "3 choses à ne pas mettre dans ta valise", "Ce que j'aurais voulu savoir avant mon premier voyage seul"] }
+      ]
+    },
+    beaute: {
+      name: "Beauté et soin", comp: 3, faceless: 2, monet: 3, tags: ["#beaute", "#soin"],
+      note: "La beauté est en tête des ventes sur TikTok Shop. Donne des avis honnêtes, sans promesse de résultat, et indique clairement les produits offerts ou les partenariats.",
+      format: "plans de mains et de produits, voix off et texte à l'écran.",
+      product: "un guide de routine en PDF avec une liste de produits à petit prix.",
+      angles: [
+        { n: "Routines simples", kw: "routine skincare", tag: "#skincare", ideas: ["Une routine de soin du visage en 3 étapes", "Dans quel ordre appliquer tes produits", "Ce que j'ai arrêté d'utiliser sur ma peau"] },
+        { n: "Produits à petit prix", kw: "beauté pas chère", tag: "#beautepascher", ideas: ["Les produits beauté à moins de 10 € que je rachète", "Le produit moins cher que j'ai comparé", "Mon avis honnête sur un produit viral"] },
+        { n: "Soin des cheveux", kw: "soin cheveux", tag: "#soincheveux", ideas: ["La routine cheveux en 4 étapes", "L'erreur de lavage que beaucoup de gens font", "Mon avant et après sur 30 jours"] }
+      ]
+    }
+  };
+
+  var DAYS = 60;
+  var WEEKS = [
+    ["Lancer", "Ton profil, tes premières vidéos et tes premiers chiffres."],
+    ["Doubler ce qui marche", "Tu gardes ton meilleur format et tu le répètes."],
+    ["Construire ton public", "Ton mini-guide gratuit en ligne, pour récupérer des adresses email."],
+    ["Vendre", "Ton premier produit créé, mis en vente et présenté en vidéo."],
+    ["Optimiser", "Tu testes tes accroches, tu gardes les meilleures et tu analyses ton premier mois."],
+    ["Vendre en continu", "Une séquence d'emails, les objections de tes abonnés et de vrais retours clients."],
+    ["Élargir", "Tes meilleures vidéos sur Reels et Shorts, une collaboration, un deuxième produit."],
+    ["Passer à l'échelle", "Deuxième produit en vente, test de prix, semaine de lancement et plan du mois 3."]
+  ];
+  function weekOf(d) { return Math.min(8, Math.ceil(d / 7)); }
+  var REVIEW_DAYS = [7, 14, 21, 28, 30, 35, 42, 49, 56, 60];
+
+  var SERIES = [
+    "Les 3 questions qu'on te pose le plus sur {kw}",
+    "Mythe ou réalité : une idée reçue sur {kw}",
+    "Ma réponse à un commentaire sur {kw}",
+    "Ce que j'ai appris cette semaine sur {kw}",
+    "Le récap de ma semaine sur {kw}",
+    "Une question de débutant sur {kw}, et ma réponse",
+    "Le matériel ou l'outil gratuit que j'utilise pour {kw}",
+    "Ce qui m'a pris le plus de temps en {kw}",
+    "Comment j'organise ma semaine autour de {kw}",
+    "Le conseil sur {kw} que je donnerais à un ami",
+    "Un petit défi sur {kw} à faire aujourd'hui",
+    "Ce que je ne ferai plus jamais en {kw}",
+    "Comparaison : deux façons de faire {kw}",
+    "Le point de départ le plus simple en {kw}",
+    "Ce que tu peux faire en 5 minutes pour {kw}"
+  ];
+
+  var EXTRA = {
+    finance: [["Comment je fais mes courses d'étudiant avec 40 € par semaine", "Le tableau de budget que j'utilise chaque mois"], ["Les erreurs qui rallongent le remboursement d'une dette", "Mon plan de remboursement, mois par mois"], ["Où couper 100 € sans que ça se voie", "L'appli gratuite que j'utilise pour suivre mes dépenses"]],
+    langues: [["5 mots d'anglais à éviter en réunion", "Comment présenter ton travail en anglais en 20 secondes"], ["3 façons de dire « merci » en espagnol", "Comment réserver une chambre en espagnol"], ["Ces expressions anglaises n'ont aucun sens mot à mot", "Dis « je suis d'accord » de 4 façons différentes"]],
+    foot: [["Les équipes qui marquent le plus de buts de la tête", "Le gardien qui arrête le plus de penaltys"], ["Le rôle d'un milieu relayeur, expliqué simplement", "Pourquoi un latéral joue parfois au milieu"], ["Le plus long match de l'histoire de ton club", "Le stade le plus bruyant et d'où ça vient"]],
+    gaming: [["Le réglage de sensibilité que presque personne ne change", "3 raccourcis qui font gagner du temps dans ce jeu"], ["Le jeu indé du moment à surveiller", "Les suites de jeux les plus attendues"], ["La console qui a changé ta façon de jouer", "Le jeu rétro qu'on peut finir en une soirée"]],
+    perso: [["Ce que j'ai retiré de ma routine du matin", "Une routine du matin avec 10 minutes seulement"], ["Comment j'utilise un minuteur pour m'y mettre", "Pourquoi ta liste de tâches te bloque"], ["Mon planning de révision sur une semaine", "Comment je note mes cours pour mieux retenir"]],
+    bienetre: [["Les étirements du réveil en 3 minutes", "Étirer ses épaules après une journée d'ordinateur"], ["Une séance de jambes avec une chaise", "Le circuit de 15 minutes pour débutants"], ["Pourquoi je pose mon téléphone avant de dormir", "Ma routine de 5 minutes pour m'endormir"]],
+    cuisine: [["Que faire des peaux de légumes", "La soupe qui vide le bac à légumes"], ["Le petit-déjeuner à moins de 1 €", "Les féculents les moins chers et comment les cuisiner"], ["Comment ranger son frigo après le meal prep", "Un repas, trois façons de le recycler"]],
+    tech: [["Comment faire une fiche de révision en 1 minute avec l'IA", "L'outil gratuit pour corriger ses fautes"], ["Comment classer tes dépenses avec un tableur et l'IA", "Mon prompt pour trouver où économiser"], ["Comment envoyer un message automatique chaque semaine", "L'automatisation qui trie mes emails"]],
+    metiers: [["Comment reconnaître le fil de terre", "Le matériel pour changer une ampoule en sécurité"], ["Fixer une étagère sans se rater", "Reboucher un trou dans un mur en 3 étapes"], ["Ce que je prépare la veille d'un chantier", "Les questions que je pose avant de faire un devis"]],
+    business: [["Où je trouve mes premiers clients", "Comment je relance un client qui ne répond pas"], ["Comment j'ai choisi le nom de mon commerce", "Ce que j'ai appris pendant ma première semaine d'ouverture"], ["Les 3 questions pour choisir ta spécialité", "Comment je parle de mon offre à un inconnu"]],
+    voyage: [["Comment je trouve un hébergement à petit prix", "Mon budget détaillé d'un week-end"], ["Le week-end nature à moins de 2 heures de chez toi", "3 petits villages à visiter en une journée"], ["Ce que j'emporte toujours dans mon sac de voyage", "Comment je prépare mes papiers avant de partir"]],
+    beaute: [["Comment choisir une crème solaire pour le visage", "Pourquoi je n'applique pas tous mes produits le même jour"], ["Les produits que je ne rachèterais pas", "Ma trousse de base à moins de 30 €"], ["Comment je sèche mes cheveux sans les abîmer", "Mon choix de brosse et pourquoi"]]
+  };
+  Object.keys(EXTRA).forEach(function (k) {
+    EXTRA[k].forEach(function (pair, i) { NICHES[k].angles[i].ideas = NICHES[k].angles[i].ideas.concat(pair); });
+  });
+
+var COMP_WORDS = ["", "Faible", "Moyenne", "Forte"];
+  var FACE_WORDS = ["", "Difficile", "Possible", "Facile"];
+  var MONET_WORDS = ["", "Limité", "Correct", "Élevé"];
+
+  var BLOCK_TIPS = {
+    idees: "Ton espace Coach te donne 9 idées prêtes, avec accroche et hashtags. Pour chaque vidéo publiée, note une idée voisine à tourner ensuite.",
+    temps: "Tourne 3 à 5 vidéos en une seule session de 90 minutes, puis publie-les au fil de la semaine.",
+    decolle: "Change un seul élément à la fois (l'accroche, le format ou le sujet) et juge sur 10 vidéos, pas sur une.",
+    monet: "Ne monétise pas tout de suite. Construis d'abord une liste d'emails avec un mini-guide gratuit, puis propose un petit produit."
+  };
+
+  var GOAL_TIPS = {
+    audience: "Objectif audience : ne vends rien pendant les deux premières semaines et concentre-toi sur la régularité.",
+    revenus: "Objectif premiers revenus : les paiements directs de TikTok demandent déjà plusieurs milliers d'abonnés. Pour gagner plus tôt, vends un petit produit à ton public.",
+    vendre: "Objectif vente : montre ton produit en situation dans une vidéo sur trois, sans en faire une publicité."
+  };
+
+  var RHYTHM = { t1: 3, t2: 5, t3: 7 };
+  var PATTERN = { 3: [1, 3, 5], 5: [1, 2, 4, 5, 6], 7: [1, 2, 3, 4, 5, 6, 7] };
+
+  var HOOKS = [
+    "L'erreur que presque tout le monde fait en {kw}",
+    "3 choses que j'aurais aimé savoir avant de commencer : {kw}",
+    "Arrête de faire ça si tu veux progresser en {kw}",
+    "Voici comment je gère {kw} en moins d'une minute",
+    "Si tu débutes en {kw}, regarde ça avant de continuer",
+    "Ce que je ferais si je recommençais {kw} de zéro",
+    "Avant et après : {kw} sur 30 jours",
+    "Personne ne t'explique ça quand on parle de {kw}"
+  ];
+
+    var SOURCES = [
+    { t: "Buffer, 11 millions de vidéos : médiane d'environ 500 vues (via Gens d'Internet)", u: "https://gensdinternet.fr/2025/10/22/sur-tiktok-publier-2-a-5-posts-par-semaine-augmente-en-moyenne-de-17-le-nombre-de-vues/amp/" },
+    { t: "Socialync, signaux de l'algorithme TikTok 2026 (chiffres de tiers, pas officiels)", u: "https://www.socialync.io/blog/tiktok-algorithm-2026-what-works-now" },
+    { t: "TT Calculator, référencement dans la recherche TikTok", u: "https://ttcalculator.net/guides/growth/tiktok-seo-search-ranking/" },
+    { t: "Formalive, horaires de publication en France", u: "https://www.formalive.fr/quand-publier-tiktok/" }
+  ];
+
+  /* ---------- Paiement (à remplir pour vendre pour de vrai) ----------
+     1. Crée un compte Stripe, puis deux « Payment Links » (annuel et mensuel).
+     2. Colle leurs adresses ci-dessous.
+     3. Dans chaque Payment Link, règle la redirection après paiement vers :
+        https://TON-SITE.fr/?acces=TON_CODE_SECRET   (le même code que ci-dessous)
+     Laisse les adresses vides pour garder le mode démo (aucun paiement). */
+  var PAY_LINKS = { annual: "", monthly: "" };
+  var ACCESS_CODE = "";
+  var LIVE = !!(PAY_LINKS.annual || PAY_LINKS.monthly);
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (ACCESS_CODE && qs.get("acces") === ACCESS_CODE) {
+      localStorage.setItem("bn_sub", "true");
+      history.replaceState(null, "", location.pathname);
+    }
+  } catch (e) { /* sans effet */ }
+
+  /* ---------- État et stockage ---------- */
+  var store = {
+    get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible */ } }
+  };
+  var state = {
+    step: 0, answers: {}, phase: "quiz", tab: "today",
+    sub: !!store.get("bn_sub") && (LIVE ? !!ACCESS_CODE : true),
+    stats: store.get("bn_stats") || [],
+    prog: store.get("bn_prog") || { day: 1, steps: {} },
+    chat: [], chatDraft: "", chatBusy: false, flash: "", ideasShown: 10, trackRows: 10,
+    plan: store.get("bn_plan") || "annual"
+  };
+  var app = document.getElementById("app");
+  var progressSlot = document.getElementById("progress-slot");
+
+  /* ---------- Utilitaires ---------- */
+  function h(tag, props, kids) {
+    var e = document.createElement(tag);
+    if (props) {
+      Object.keys(props).forEach(function (k) {
+        if (k === "class") e.className = props[k];
+        else if (k === "text") e.textContent = props[k];
+        else e.setAttribute(k, props[k]);
+      });
+    }
+    (kids || []).forEach(function (c) {
+      if (c == null) return;
+      e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return e;
+  }
+
+  function tile(v, big) {
+    var m = TILES[v] || TILES.unsure;
+    var s = h("span", { "class": "tile " + m.c + (big ? " lg" : ""), "aria-hidden": "true" });
+    s.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + m.p + '</svg>';
+    return s;
+  }
+
+  function section(label, nodes, tone) {
+    return h("section", { "class": "sec" + (tone ? " " + tone : "") }, [h("p", { "class": "eyebrow", text: label })].concat(nodes));
+  }
+
+  function copyText(text, btn) {
+    var label = btn.getAttribute("data-label") || btn.textContent;
+    btn.setAttribute("data-label", label);
+    function done(msg) {
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = label; }, 2000);
+    }
+    function fallback() {
+      var box = btn.parentNode.parentNode.querySelector("textarea.copybox");
+      if (!box) {
+        box = h("textarea", { "class": "copybox", readonly: "readonly", "aria-label": "Texte à copier" });
+        btn.parentNode.parentNode.appendChild(box);
+      }
+      box.value = text;
+      box.focus();
+      box.select();
+      done("Sélectionne et copie");
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { done("Copié"); }, fallback);
+    } catch (e) {
+      fallback();
+    }
+  }
+
+  function median(arr) {
+    if (!arr.length) return 0;
+    var a = arr.slice().sort(function (x, y) { return x - y; });
+    var m = Math.floor(a.length / 2);
+    return a.length % 2 ? a[m] : Math.round((a[m - 1] + a[m]) / 2);
+  }
+
+  function fmt(n) { return Number(n).toLocaleString("fr-FR"); }
+
+  /* ---------- Résolution des réponses ---------- */
+  function nicheKey() { return state.answers.theme === "unsure" ? "finance" : state.answers.theme; }
+
+  function questionAt(i) {
+    if (i < QUESTIONS.length) return QUESTIONS[i];
+    var key = nicheKey();
+    var n = NICHES[key];
+    return {
+      id: "angle",
+      title: "Quel angle te parle le plus ?",
+      hint: (state.answers.theme === "unsure" ? "Tu n'as pas choisi de thème : on part sur la finance perso, l'une des niches les plus simples à produire sans visage. " : "") + "Un angle étroit se vend mieux qu'un thème large.",
+      options: n.angles.map(function (a, idx) { return { v: String(idx), t: a.n, icon: key }; })
+    };
+  }
+
+  function buildPlan() {
+    var a = state.answers;
+    var key = nicheKey();
+    var n = NICHES[key];
+    var ai = parseInt(a.angle, 10) || 0;
+    var order = [ai].concat(n.angles.map(function (_, i) { return i; }).filter(function (i) { return i !== ai; }));
+    function mk(ang, title, series) { return { title: title, angle: ang.n, kw: ang.kw, series: !!series, tags: [ang.tag, n.tags[0], n.tags[1]] }; }
+    function spec(i) { return n.angles[i].ideas.map(function (t) { return mk(n.angles[i], t, false); }); }
+    function ser(i) { var ang = n.angles[i]; return SERIES.map(function (t) { return mk(ang, t.replace("{kw}", ang.kw), true); }); }
+    var ideas = [].concat(spec(order[0]), ser(order[0]), spec(order[1]), spec(order[2]), ser(order[1]), ser(order[2]));
+    var perWeek = RHYTHM[a.time] || 5;
+    var days = [];
+    var pat = PATTERN[perWeek];
+    var used = 0;
+    for (var d = 1; d <= DAYS; d++) {
+      var wd = ((d - 1) % 7) + 1;
+      if (pat.indexOf(wd) > -1) {
+        var idea = ideas[used % ideas.length];
+        days.push({ d: d, kind: "post", text: idea.title, idea: idea });
+        used += 1;
+      } else {
+        days.push({ d: d, kind: "rest", text: "Pas de publication. Tourne et monte les prochaines vidéos, ou repose-toi." });
+      }
+      if (REVIEW_DAYS.indexOf(d) > -1) days.push({ d: d, kind: "review", text: "Bilan" });
+    }
+    return { key: key, n: n, ai: ai, angle: n.angles[ai], ideas: ideas, perWeek: perWeek, days: days };
+  }
+
+  /* ---------- Progression ---------- */
+  function renderProgress(n) {
+    progressSlot.textContent = "";
+    if (n === null) return;
+    var bar = h("div", {
+      "class": "progress", role: "progressbar", "aria-valuemin": "1",
+      "aria-valuemax": String(TOTAL), "aria-valuenow": String(n + 1), "aria-label": "Progression du quiz"
+    });
+    for (var i = 0; i < TOTAL; i++) bar.appendChild(h("span", { "class": i <= n ? "seg on" : "seg" }));
+    progressSlot.appendChild(bar);
+  }
+
+  /* ---------- Quiz ---------- */
+  function renderQuestion() {
+    state.phase = "quiz";
+    var q = questionAt(state.step);
+    renderProgress(state.step);
+    app.textContent = "";
+    app.appendChild(h("p", { "class": "eyebrow", text: "Question " + (state.step + 1) + " sur " + TOTAL }));
+    var title = h("h2", { "class": "q", tabindex: "-1", text: q.title });
+    app.appendChild(title);
+    app.appendChild(h("p", { "class": "hint", text: q.hint }));
+    var list = h("div", { "class": "opts" + (q.grid ? " grid" : ""), role: "group", "aria-label": q.title });
+    q.options.forEach(function (o) {
+      var b = h("button", { type: "button", "class": "opt" + (state.answers[q.id] === o.v ? " sel" : "") }, [
+        tile(o.icon || o.v),
+        h("span", { "class": "opt-text" }, [h("span", { text: o.t }), SUBS[o.v] ? h("small", { text: SUBS[o.v] }) : null])
+      ]);
+      b.addEventListener("click", function () {
+        state.answers[q.id] = o.v;
+        if (state.step < TOTAL - 1) { state.step += 1; renderQuestion(); }
+        else { startAnalysis(); }
+      });
+      list.appendChild(b);
+    });
+    app.appendChild(list);
+    if (state.step > 0) {
+      var back = h("button", { type: "button", "class": "linkbtn" }, ["Question précédente"]);
+      back.addEventListener("click", function () { state.step -= 1; renderQuestion(); });
+      app.appendChild(back);
+    }
+    title.focus({ preventScroll: true });
+  }
+
+  /* ---------- Analyse ---------- */
+  function startAnalysis() {
+    state.phase = "analyze";
+    state.prog = { day: 1, steps: {} };
+    store.set("bn_prog", state.prog);
+    state.chat = [];
+    renderProgress(null);
+    var labels = [
+      "Lecture de tes réponses",
+      "Comparaison avec 12 niches",
+      "Choix de ton angle de départ",
+      "Calcul de ton rythme de publication",
+      "Préparation de ton plan"
+    ];
+    app.textContent = "";
+    app.appendChild(h("p", { "class": "eyebrow", text: "Analyse" }));
+    var t = h("h2", { "class": "q", tabindex: "-1", text: "On prépare ton plan" });
+    app.appendChild(t);
+    var list = h("ol", { "class": "steps" });
+    var items = labels.map(function (l) {
+      var li = h("li", null, [h("span", { "class": "dot" }), h("span", { text: l })]);
+      list.appendChild(li);
+      return li;
+    });
+    app.appendChild(list);
+    t.focus({ preventScroll: true });
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var gap = reduce ? 120 : 480;
+    var i = 0;
+    items[0].className = "now";
+    var timer = setInterval(function () {
+      items[i].className = "done";
+      i += 1;
+      if (i >= items.length) {
+        clearInterval(timer);
+        setTimeout(function () { state.sub ? showCoach() : showPreview(); window.scrollTo(0, 0); }, reduce ? 80 : 260);
+      } else {
+        items[i].className = "now";
+      }
+    }, gap);
+  }
+
+  /* ---------- Jauges ---------- */
+  function gauge(label, level, words, invert) {
+    var cls = invert ? (level === 1 ? "good" : level === 2 ? "warn" : "bad") : (level === 1 ? "bad" : level === 2 ? "warn" : "good");
+    var segs = h("span", { "class": "segs" });
+    for (var i = 1; i <= 3; i++) segs.appendChild(h("i", { "class": i <= level ? cls : "" }));
+    return h("div", { "class": "gauge", role: "img", "aria-label": label + " : " + words[level] }, [
+      h("span", { "class": "g-label", text: label }),
+      h("span", { "class": "g-val" }, [segs, h("b", { "class": cls, text: words[level] })])
+    ]);
+  }
+
+  function viewsCard() {
+    return h("div", { "class": "card" }, [
+      h("p", { "class": "eyebrow", text: "Ce que font les vidéos TikTok, en vrai" }),
+      h("div", { "class": "stat-row" }, [
+        h("div", { "class": "stat" }, [h("b", { text: "≈ 500" }), h("span", { text: "vues pour la vidéo médiane, quel que soit le rythme" })]),
+        h("div", { "class": "stat" }, [h("b", { text: "3 700 à 14 000+" }), h("span", { text: "vues pour les 10 % de vidéos les plus vues" })])
+      ]),
+      h("p", { "class": "small", text: "Analyse Buffer de 11 millions de vidéos issues de 150 000 comptes. Tous comptes et toutes niches confondus : ce n'est pas une prévision pour toi." }),
+      h("p", { "class": "small", text: "Publier plus ne change pas la vidéo médiane. Ça multiplie surtout tes chances de tomber sur une vidéo qui décolle." })
+    ]);
+  }
+
+  /* ---------- Aperçu gratuit ---------- */
+  function scoreTile(label, level, words, invert) {
+    var cls = invert ? (level === 1 ? "good" : level === 2 ? "warn" : "bad") : (level === 1 ? "bad" : level === 2 ? "warn" : "good");
+    var segs = h("span", { "class": "segs wide" });
+    for (var i = 1; i <= 3; i++) segs.appendChild(h("i", { "class": i <= level ? cls : "" }));
+    return h("div", { "class": "score", role: "img", "aria-label": label + " : " + words[level] }, [
+      h("span", { "class": "lbl", text: label }),
+      segs,
+      h("b", { "class": cls, text: words[level] })
+    ]);
+  }
+
+  function kpis(P) {
+    var items = [
+      [String(P.perWeek), "vidéos par semaine"],
+      ["60", "jours guidés, une mission par jour"],
+      [String(P.ideas.length), "idées avec accroche et hashtags"],
+      ["IA", "un coach pour répondre à tes questions"]
+    ];
+    return h("div", { "class": "kpis" }, items.map(function (it) {
+      return h("div", { "class": "kpi" }, [h("b", { text: it[0] }), h("span", { text: it[1] })]);
+    }));
+  }
+
+  function showPreview() {
+    state.phase = "preview";
+    var P = buildPlan();
+    var n = P.n;
+    var a = state.answers;
+    renderProgress(null);
+    app.textContent = "";
+
+    var name = h("h2", { "class": "niche-name", tabindex: "-1", text: n.name });
+    app.appendChild(h("div", { "class": "hero" }, [
+      h("div", { "class": "hero-top" }, [tile(P.key, true), h("span", { "class": "demo", text: "Ton analyse" })]),
+      h("p", { "class": "eyebrow", text: "Ta niche de départ" }),
+      name,
+      h("div", { "class": "pills" }, [
+        h("span", { "class": "pill", text: "Angle : " + P.angle.n }),
+        h("span", { "class": "pill", text: P.perWeek + " vidéos par semaine" })
+      ])
+    ]));
+
+    app.appendChild(h("div", { "class": "scores" }, [
+      scoreTile("Concurrence", n.comp, COMP_WORDS, true),
+      scoreTile("Sans visage", n.faceless, FACE_WORDS, false),
+      scoreTile("Potentiel de vente", n.monet, MONET_WORDS, false)
+    ]));
+    app.appendChild(h("p", { "class": "hint", text: n.note }));
+
+    app.appendChild(section("Ton plan est prêt", [kpis(P)]));
+
+    var nVideos = P.days.filter(function (x) { return x.kind === "post"; }).length;
+    var lift = P.perWeek >= 6 ? "+29 %" : "+17 %";
+    var liftRange = P.perWeek >= 6 ? "6 à 10 vidéos par semaine" : "2 à 5 vidéos par semaine";
+
+    // Chiffres : repères réels et objectifs affichés comme tels
+    app.appendChild(section("Les chiffres qui font la différence", [
+      h("div", { "class": "bigstats" }, [
+        h("div", { "class": "bigstat s1" }, [h("b", { text: "3 700 à 14 000+" }), h("span", { text: "vues par vidéo pour les 10 % de vidéos les plus vues. C'est le niveau que ce plan te fait viser." })]),
+        h("div", { "class": "bigstat s2" }, [h("b", { text: lift }), h("span", { text: "de vues par vidéo en moyenne avec " + liftRange + ", par rapport à 1 par semaine" })]),
+        h("div", { "class": "bigstat s3" }, [h("b", { text: String(nVideos) }), h("span", { text: "vidéos publiées en 60 jours : autant de chances de voir une vidéo décoller" })])
+      ]),
+      h("p", { "class": "small", text: "Chiffres tirés d'une analyse Buffer de 11 millions de vidéos et de 150 000 comptes, tous thèmes confondus. La vidéo médiane fait environ 500 vues : le plan sert à viser les meilleures, pas à les garantir." })
+    ], "tone-a"));
+
+    // Objectifs à 60 jours
+    var goalsList = h("ul", { "class": "targets" }, [
+      ["Jour 14", "10 vidéos publiées et un format gagnant repéré"],
+      ["Jour 30", "Mini-guide en ligne et premier produit en vente"],
+      ["Jour 45", "Tes meilleures vidéos sur 3 plateformes, une collaboration proposée"],
+      ["Jour 60", "Deuxième produit en vente, une vidéo à viser au-dessus de 3 700 vues"]
+    ].map(function (t) { return h("li", null, [h("span", { "class": "dd", text: t[0] }), h("span", { text: t[1] })]); }));
+    app.appendChild(section("Tes objectifs à 60 jours", [
+      goalsList,
+      h("div", { "class": "calc" }, [h("b", { text: "Exemple de calcul" }), h("span", { text: "20 ventes d'un produit à 19 € font 380 €. C'est de l'arithmétique, pas une prévision : le nombre de ventes dépend de ton audience et de ton offre." })])
+    ], "tone-b"));
+
+    var weeksList = h("ol", { "class": "weeks" }, WEEKS.map(function (w, i) {
+      var locked = i >= 2;
+      var li = h("li", { "class": locked ? "lockedrow" : "" }, [h("span", { "class": "wk", text: "S" + (i + 1) }), h("div", null, [h("b", { text: w[0] }), h("span", { text: w[1] })])]);
+      if (locked) li.insertAdjacentHTML("beforeend", LOCK);
+      return li;
+    }));
+    app.appendChild(section("Tes 8 semaines, déjà prêtes", [
+      h("p", { text: "Toutes les missions des 60 jours sont écrites. Les semaines 1 et 2 sont visibles, le reste se débloque avec l'abonnement." }),
+      weeksList
+    ], "tone-c"));
+
+    app.appendChild(section("Ce que tu auras à la fin des 60 jours", [
+      h("ul", { "class": "incl" }, [
+        h("li", { text: nVideos + " vidéos publiées, avec accroche, légende et hashtags" }),
+        h("li", { text: "Un mini-guide gratuit en ligne et une séquence d'emails pour récupérer des contacts" }),
+        h("li", { text: "Deux produits en vente. Premier produit possible : " + n.product }),
+        h("li", { text: "Tes vidéos sur TikTok, Reels et Shorts" }),
+        h("li", { text: "Tes propres chiffres : médiane, meilleure vidéo, téléchargements, ventes" }),
+        h("li", { text: "Ton format gagnant et un plan pour le mois 3" })
+      ]),
+      h("p", { "class": "small", text: "Ce sont des livrables : ils dépendent de ton travail, pas de l'algorithme." })
+    ]));
+
+    // Aperçu du jour 1
+    var M1 = stepsFor(P, 1);
+    var total1 = M1.steps.reduce(function (s, x) { return s + x.mins; }, 0);
+    var rows = M1.steps.map(function (s, i) {
+      var row = h("div", { "class": "preview-row" }, [
+        h("span", { "class": "stepnum", text: String(i + 1) }),
+        h("div", { "class": "lr-text" }, [h("b", { text: s.t }), h("span", { text: "≈ " + s.mins + " min · détail réservé aux abonnés" })])
+      ]);
+      row.insertAdjacentHTML("beforeend", LOCK);
+      return row;
+    });
+    app.appendChild(section("Ton jour 1 : tu sais exactement quoi faire", [
+      h("p", { text: "Chaque jour, une mission en " + M1.steps.length + " étapes (environ " + total1 + " min). Pour chaque étape : quoi faire, quoi dire, sur quoi cliquer." }),
+      h("div", { "class": "preview-rows" }, rows)
+    ]));
+
+    // Contenu verrouillé
+    function lockRow(title, sub, blur) {
+      var row = h("div", { "class": "preview-row lockedrow" + (blur ? " blur" : "") }, [
+        h("span", { "class": "stepnum", text: "·" }),
+        h("div", { "class": "lr-text" }, [h("b", { text: title }), h("span", { text: sub })])
+      ]);
+      row.insertAdjacentHTML("beforeend", LOCK);
+      return row;
+    }
+    var posts = P.days.filter(function (x) { return x.kind === "post"; });
+    var dayRows = posts.slice(1, 5).map(function (x, i) { return lockRow("Jour " + x.d + " : " + x.text, "6 étapes détaillées · réservé aux abonnés", i >= 2); });
+    app.appendChild(section("Les jours suivants", [
+      h("div", { "class": "preview-rows" }, dayRows),
+      h("p", { "class": "small", text: "+ " + (DAYS - 5) + " autres jours guidés, de la première vidéo au deuxième produit." })
+    ], "tone-d"));
+    var ideaRows = P.ideas.slice(0, 4).map(function (x, i) { return lockRow(x.title, "Accroche, légende et hashtags · réservé aux abonnés", i >= 2); });
+    ideaRows.push(lockRow("Coach IA", "Pose tes questions, fais écrire tes scripts et tes emails", false));
+    app.appendChild(section("Tes " + P.ideas.length + " idées et ton Coach IA", [h("div", { "class": "preview-rows" }, ideaRows)]));
+
+    // Comparaison
+    function list(items) { return h("ul", null, items.map(function (t) { return h("li", { text: t }); })); }
+    app.appendChild(section("Avec ou sans plan", [
+      h("div", { "class": "compare" }, [
+        h("div", { "class": "cmp no" }, [h("h4", { text: "Sans plan" }), list([
+          "Tu cherches une idée chaque jour",
+          "Tu ne sais pas quoi dire dans les 3 premières secondes",
+          "Tu publies au hasard et tu ne sais pas quoi améliorer"
+        ])]),
+        h("div", { "class": "cmp yes" }, [h("h4", { text: "Avec le Coach" }), list([
+          "Une mission par jour, pendant 60 jours",
+          "Accroche et légende prêtes à copier",
+          "Un Coach IA quand tu bloques",
+          "Un suivi qui te dit quoi garder"
+        ])])
+      ])
+    ]));
+
+    // Offres
+    var PLANS = [
+      { id: "annual", name: "Annuel", price: "59 €", per: "par an", note: "soit 4,92 € par mois, 59,80 € de moins que le mensuel", badge: "Meilleur prix", cta: "59 € par an" },
+      { id: "monthly", name: "Mensuel", price: "9,90 €", per: "par mois", note: "Paiement chaque mois", cta: "9,90 € par mois" }
+    ];
+    var chosen = state.plan || "annual";
+    var subBtn = h("button", { type: "button", "class": "btn cta", id: "subscribe" });
+    var barPrice = h("span");
+    var cards = [];
+    function applyPlan() {
+      var pl = PLANS.filter(function (x) { return x.id === chosen; })[0];
+      subBtn.textContent = "Débloquer mon plan · " + pl.cta + (LIVE ? "" : " (démo)");
+      barPrice.textContent = pl.cta + (LIVE ? "" : " · démo");
+      cards.forEach(function (c) { c.el.classList.toggle("sel", c.id === chosen); });
+    }
+    var planCards = PLANS.map(function (pl) {
+      var input = h("input", { type: "radio", name: "plan", id: "plan-" + pl.id, value: pl.id });
+      input.checked = pl.id === chosen;
+      input.addEventListener("change", function () { chosen = pl.id; state.plan = pl.id; applyPlan(); });
+      var el = h("label", { "class": "pricecard" + (pl.badge ? " best" : ""), "for": "plan-" + pl.id }, [
+        pl.badge ? h("span", { "class": "ribbon", text: pl.badge }) : null,
+        input,
+        h("span", { "class": "pc-body" }, [h("span", { "class": "pc-name", text: pl.name }), h("span", { "class": "pc-note", text: pl.note })]),
+        h("span", { "class": "pc-price" }, [h("b", { text: pl.price }), h("span", { text: pl.per })])
+      ]);
+      cards.push({ id: pl.id, el: el });
+      return el;
+    });
+
+    function subscribe() {
+      if (LIVE) {
+        var link = PAY_LINKS[chosen] || PAY_LINKS.annual || PAY_LINKS.monthly;
+        window.location.href = link;
+        return;
+      }
+      state.sub = true;
+      state.plan = chosen;
+      store.set("bn_sub", true);
+      store.set("bn_plan", chosen);
+      state.tab = "today";
+      showCoach();
+      window.scrollTo(0, 0);
+    }
+    subBtn.addEventListener("click", subscribe);
+
+    app.appendChild(section("Choisis ton offre", [
+      h("div", { "class": "plans", role: "radiogroup", "aria-label": "Offre" }, planCards),
+      h("div", { "class": "paywall" }, [
+        LIVE ? h("span", { "class": "demo", text: "Paiement sécurisé par Stripe" }) : h("span", { "class": "demo", text: "Démo : aucun paiement" }),
+        h("h3", { text: "Tout est inclus" }),
+        h("ul", { "class": "incl" }, [
+          h("li", { text: "60 jours guidés, prêts dès aujourd'hui : une mission, une étape à la fois, de la première vidéo jusqu'à deux produits en vente" }),
+          h("li", { text: P.ideas.length + " idées de vidéos, accroche et hashtags inclus" }),
+          h("li", { text: "Mini-guide gratuit, premier produit et page de vente : chaque étape expliquée" }),
+          h("li", { text: "Un Coach IA pour répondre à tes questions et écrire tes scripts" }),
+          h("li", { text: "Suivi de tes vidéos : médiane, meilleure vidéo, prochaine étape" })
+        ]),
+        h("p", { "class": "small", text: "Prix d'exemple. Pas de promesse de vues : la plupart des vidéos restent sous 500 vues. Le Coach t'aide à publier régulièrement et à mesurer ce qui marche." }),
+        subBtn
+      ])
+    ]));
+    applyPlan();
+
+    // FAQ
+    function qa(q, r) { return h("details", null, [h("summary", { text: q }), h("p", { text: r })]); }
+    app.appendChild(section("Questions fréquentes", [
+      h("div", { "class": "faq" }, [
+        qa("Est-ce que ça garantit des vues ?", "Non. La vidéo médiane fait environ 500 vues, et personne ne peut te garantir mieux. Le Coach augmente tes chances en te faisant publier régulièrement, et le Suivi te montre ce qui marche."),
+        qa("Dois-je montrer mon visage ?", "Non. Tu as choisi un format " + (a.format === "visage" ? "avec visage, mais" : "sans visage, et") + " chaque mission s'adapte à ton choix."),
+        qa("Combien de temps par jour ?", "Environ 50 minutes les jours de vidéo, moins les autres jours. Quelques jours de la semaine 3 et de la semaine 4 sont plus longs, car tu écris ton guide et ton produit."),
+        qa("Et si ma niche ne marche pas ?", "Le Suivi te le montre au bout de 10 vidéos. Tu peux alors refaire le quiz et tester un autre angle.")
+      ])
+    ]));
+
+    // Réalité des vues et points d'attention
+    var warnings = [];
+    if (n.comp === 3) warnings.push("Concurrence forte : ton angle doit être étroit et s'adresser à un public précis.");
+    if (a.format !== "visage" && n.faceless === 1) warnings.push("Cette niche se montre à l'écran. Sans visage, prévois des clips ou des plans de mains.");
+    warnings.push(GOAL_TIPS[a.goal]);
+    app.appendChild(section("À garder en tête", [h("ul", null, warnings.map(function (w) { return h("li", { text: w }); }))]));
+
+    var restart = h("button", { type: "button", "class": "linkbtn" }, ["Refaire le quiz"]);
+    restart.addEventListener("click", restartQuiz);
+    app.appendChild(restart);
+
+    var bar = h("div", { "class": "cta-bar" }, [
+      h("div", null, [h("b", { text: "Passe Coach" }), barPrice]),
+      h("button", { type: "button", "class": "btn small" }, ["Débloquer"])
+    ]);
+    bar.querySelector("button").addEventListener("click", subscribe);
+    app.appendChild(bar);
+    applyPlan();
+    name.focus({ preventScroll: true });
+  }
+
+  
+function restartQuiz() {
+    state.step = 0; state.answers = {}; state.phase = "quiz";
+    renderQuestion();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Espace Coach ---------- */
+  var TABS = [
+    ["today", "Aujourd'hui"],
+    ["idees", "Idées"],
+    ["coach", "Coach IA"],
+    ["suivi", "Suivi"]
+  ];
+
+  function showCoach() {
+    state.phase = "coach";
+    var P = buildPlan();
+    renderProgress(null);
+    app.textContent = "";
+    var hero = h("div", { "class": "hero" }, [
+      h("div", { "class": "hero-top" }, [tile(P.key, true), h("span", { "class": "demo", text: "Démo : abonnement simulé" })]),
+      h("p", { "class": "eyebrow", text: "Ton plan est débloqué" }),
+      h("h2", { "class": "niche-name", tabindex: "-1", id: "coach-title", text: P.n.name }),
+      h("div", { "class": "pills" }, [h("span", { "class": "pill", text: "Angle : " + P.angle.n })])
+    ]);
+    app.appendChild(hero);
+
+    var tabs = h("div", { "class": "tabs", role: "tablist", "aria-label": "Sections du Coach" });
+    TABS.forEach(function (t) {
+      var b = h("button", { type: "button", "class": "tab", role: "tab", id: "tab-" + t[0], "aria-selected": state.tab === t[0] ? "true" : "false" }, [t[1]]);
+      b.addEventListener("click", function () { state.tab = t[0]; showCoach(); });
+      tabs.appendChild(b);
+    });
+    app.appendChild(tabs);
+
+    var panel = h("div", { "class": "panel", role: "tabpanel", "aria-labelledby": "tab-" + state.tab });
+    if (state.tab === "today") renderToday(panel, P);
+    else if (state.tab === "idees") renderIdeas(panel, P);
+    else if (state.tab === "coach") renderChat(panel, P);
+    else renderTracker(panel);
+    app.appendChild(panel);
+
+    var src = h("div", { "class": "sources" }, [
+      h("p", { "class": "eyebrow", text: "Sources" }),
+      h("ul", null, SOURCES.map(function (s) {
+        return h("li", null, [h("a", { href: s.u, target: "_blank", rel: "noopener noreferrer", text: s.t })]);
+      })),
+      h("p", { "class": "small", text: "Plusieurs de ces chiffres viennent de blogs et d'études tierces, pas de TikTok. Ce sont des pistes à vérifier dans tes propres statistiques." })
+    ]);
+    app.appendChild(src);
+
+    var foot = h("div", { "class": "actions" });
+    var restart = h("button", { type: "button", "class": "btn ghost small" }, ["Refaire le quiz"]);
+    restart.addEventListener("click", restartQuiz);
+    var unsub = h("button", { type: "button", "class": "btn ghost small" }, ["Se désabonner (démo)"]);
+    unsub.addEventListener("click", function () {
+      state.sub = false;
+      store.set("bn_sub", false);
+      showPreview();
+      window.scrollTo(0, 0);
+    });
+    foot.appendChild(restart);
+    if (!LIVE) foot.appendChild(unsub);
+    app.appendChild(foot);
+  }
+
+  function saveProg() { store.set("bn_prog", state.prog); }
+
+  function milestones(d, P) {
+    var a = state.answers;
+    var n = P.n;
+    var ang = P.angle;
+    var first = [];
+    var extra = [];
+    var legal = "En France, vendre régulièrement demande un statut (par exemple micro-entrepreneur). Renseigne-toi avant de vendre.";
+    if (d === 1) {
+      first.push({ t: "Prépare ton profil", mins: 10, why: "Un profil clair dit tout de suite de quoi parle ton compte.", how: ["Choisis un nom de compte simple, avec ton thème dedans.", "Écris une bio d'une ligne : ce que tu partages, pour qui, avec le mot-clé « " + ang.kw + " ».", "Mets une photo ou un logo lisible en petit.", "Ne mets pas encore de lien : tu l'ajouteras en semaine 3."], ask: "Aide-moi à écrire ma bio TikTok pour mon angle « " + ang.n + " »", askLabel: "Demander ma bio au Coach IA" });
+    }
+    if (d === 8) {
+      extra.push({ t: "Reprends ton meilleur format", mins: 5, why: "Répéter ce qui marche est plus efficace que tout changer.", how: ["Ouvre le Suivi et repère ta meilleure vidéo.", "Note son sujet, sa durée et son accroche.", "Garde-les pour les vidéos de cette semaine."], goTab: "suivi", goLabel: "Ouvrir le Suivi" });
+    }
+    if (d === 15) {
+      extra.push({ t: "Choisis le sujet de ton mini-guide gratuit", mins: 15, why: "Un guide gratuit te permet de récupérer des adresses email, un canal qui t'appartient.", how: ["Repère la question qu'on te pose le plus en commentaire.", "Donne un titre simple : « Comment … en … jours ».", "Liste 5 à 7 points qui y répondent."], ask: "Aide-moi à choisir le sujet de mon mini-guide gratuit pour l'angle « " + ang.n + " »", askLabel: "Demander de l'aide au Coach IA" });
+    }
+    if (d === 17) {
+      extra.push({ t: "Écris ton mini-guide", mins: 40, why: "Un guide court et utile vaut mieux qu'un long guide jamais fini.", how: ["Ouvre un document (Google Docs, Word ou Canva).", "Écris une page par point : un conseil, un exemple, une action à faire.", "Ajoute une page de couverture et une dernière page « Et maintenant ? ».", "Exporte en PDF."], ask: "Aide-moi à écrire mon mini-guide gratuit sur « " + ang.n + " »", askLabel: "Écrire mon guide avec le Coach IA" });
+    }
+    if (d === 19) {
+      extra.push({ t: "Mets ton mini-guide en ligne", mins: 20, why: "Un lien à partager, c'est ce qui transforme tes abonnés en contacts.", how: ["Crée un compte gratuit sur une plateforme de vente ou d'email (Gumroad, par exemple).", "Ajoute ton PDF et propose-le gratuitement, contre une adresse email si la plateforme le permet.", "Copie le lien du guide.", "Ajoute-le dans ta bio quand TikTok te le permet. Sinon, propose le guide en message privé à ceux qui le demandent."] });
+    }
+    if (d === 22) {
+      extra.push({ t: "Définis ton premier produit", mins: 20, why: "Un seul produit simple se termine et se vend plus vite que dix idées.", small: legal + (a.goal === "audience" ? " Tu veux seulement faire grandir ton audience ? Tu peux sauter les étapes de vente et continuer ta série." : ""), big: n.product, how: ["Relis les questions les plus fréquentes de ton public.", "Choisis un seul produit, comme celui ci-dessus.", "Fixe un petit prix. Par exemple entre 9 € et 29 €.", "Écris en une phrase ce qu'il règle : « Avec ça, tu peux … »."] });
+    }
+    if (d === 24) {
+      extra.push({ t: "Crée ton produit", mins: 40, why: "Ton mini-guide est déjà la moitié du travail.", how: ["Reprends ton mini-guide et ajoute la suite : exemples, modèles ou exercices.", "Relis tout à voix haute pour trouver les passages flous.", "Exporte en PDF."], ask: "Aide-moi à créer mon premier produit : " + n.product, askLabel: "Créer mon produit avec le Coach IA" });
+    }
+    if (d === 26) {
+      extra.push({ t: "Mets ton produit en vente", mins: 25, why: "Une page claire se lit en 10 secondes.", how: ["Sur la même plateforme que ton guide, crée la page du produit.", "Écris un titre clair, une phrase de promesse réaliste et le prix.", "Liste ce qui est inclus : nombre de pages, exemples, modèles.", "Relis la page comme si tu ne connaissais pas le sujet."] });
+    }
+    if (d === 27) {
+      extra.push({ t: "Présente ton produit en vidéo", mins: 20, why: "Tes abonnés doivent savoir qu'il existe.", how: ["Tourne une vidéo : le problème, puis ce que contient ton produit, puis où le trouver.", "Ne promets aucun résultat que tu n'as pas obtenu.", "Dis clairement que c'est ton produit."] });
+    }
+    if (d === 29) {
+      extra.push({ t: "Relance ton guide et ton produit", mins: 15, why: "Beaucoup de gens ont besoin de voir une offre plusieurs fois.", how: ["Publie une vidéo qui répond à la question la plus posée, avec le guide gratuit en suite.", "Réponds aux messages et aux commentaires."] });
+    }
+    var m2 = {
+      31: { t: "Analyse ton premier mois", mins: 20, why: "Tes chiffres te disent quoi garder et quoi arrêter.", how: ["Ouvre le Suivi et classe tes vidéos de la plus vue à la moins vue.", "Pour les 3 meilleures : note le sujet, la durée et la première phrase.", "Pour les 3 moins vues : note ce qui les distingue.", "Écris une règle pour le mois 2, par exemple « je garde les vidéos de moins de 30 secondes »."], goTab: "suivi", goLabel: "Ouvrir le Suivi" },
+      33: { t: "Teste deux accroches sur le même sujet", mins: 10, why: "Même sujet, accroche différente : tu vois ce qui fait la différence.", how: ["Choisis un sujet qui a déjà bien marché.", "Écris deux accroches différentes pour ce sujet.", "Publie la première aujourd'hui et la seconde dans 3 jours.", "Compare les vues dans le Suivi."], ask: "Écris-moi 2 accroches différentes pour le sujet qui a le mieux marché pour mon angle « " + ang.n + " »", askLabel: "Demander 2 accroches au Coach IA" },
+      36: { t: "Écris une séquence de 3 emails", mins: 40, why: "Un email arrive chez la personne, sans dépendre de l'algorithme.", how: ["Email 1 : bienvenue et lien du guide gratuit.", "Email 2 (2 jours après) : un conseil utile tiré de ton guide.", "Email 3 (5 jours après) : présente ton produit avec ce qu'il contient et son prix.", "Programme-les dans ta plateforme d'email si elle le permet."], ask: "Écris une séquence de 3 emails pour mon guide gratuit et mon produit : " + n.product, askLabel: "Écrire mes emails avec le Coach IA" },
+      38: { t: "Réponds aux objections en vidéo", mins: 20, why: "Répondre aux doutes des gens est la meilleure façon de présenter ton produit.", how: ["Relis les commentaires et messages : note les 3 questions ou doutes qui reviennent.", "Tourne une vidéo qui répond honnêtement à l'un d'eux.", "Termine en indiquant où trouver ton guide ou ton produit."] },
+      40: { t: "Demande de vrais retours", mins: 15, why: "Un avis réel vaut plus que n'importe quelle promesse.", how: ["Écris aux personnes qui ont téléchargé ton guide ou acheté ton produit.", "Demande-leur ce qui leur a servi et ce qui manque.", "N'affiche un avis qu'avec l'accord de la personne, et n'invente jamais un témoignage."] },
+      43: { t: "Reposte tes meilleures vidéos sur Reels et Shorts", mins: 20, why: "La même vidéo peut toucher d'autres publics.", how: ["Prends tes 3 vidéos les plus vues.", "Exporte-les sans filigrane, depuis ton fichier de montage.", "Publie-les sur Instagram Reels et YouTube Shorts avec la même légende."] },
+      45: { t: "Prépare une collaboration", mins: 20, why: "Un créateur proche de ta niche peut te faire connaître.", how: ["Repère 3 comptes de taille proche de la tienne, sur un sujet voisin.", "Écris-leur un message court : qui tu es, une idée de vidéo commune, ce que ça leur apporte.", "N'insiste pas s'ils ne répondent pas, passe au suivant."], ask: "Écris un message court pour proposer une collaboration à un créateur de ma niche", askLabel: "Écrire mon message avec le Coach IA" },
+      47: { t: "Définis ton deuxième produit", mins: 20, why: "Un deuxième produit, lié au premier, aide à vendre davantage aux mêmes personnes.", how: ["Relis les retours de tes premiers clients.", "Choisis ce qui leur manque : modèles, exercices, plan détaillé.", "Fixe un prix un peu plus élevé que le premier.", "Écris en une phrase ce qu'il règle."], ask: "Aide-moi à définir un deuxième produit à partir de : " + n.product, askLabel: "Demander des idées au Coach IA" },
+      50: { t: "Crée ton deuxième produit", mins: 45, why: "Tu réutilises ce que tu as déjà : retours, vidéos, modèles.", how: ["Rassemble les contenus utiles.", "Organise-les en 3 à 5 parties.", "Relis, corrige, exporte en PDF."] },
+      52: { t: "Mets-le en vente", mins: 25, why: "Même principe que la première page de vente.", how: ["Crée la page du produit sur ta plateforme.", "Titre clair, promesse réaliste, contenu détaillé, prix.", "Ajoute un lien vers ce produit dans ton premier produit."] },
+      54: { t: "Teste un nouveau prix", mins: 15, why: "Un petit test te montre ce que les gens acceptent de payer.", how: ["Choisis un produit et change le prix de quelques euros.", "Note la date du changement.", "Compare le nombre de ventes avant et après sur 2 semaines.", "Ne baisse pas ton prix sans raison : tu peux aussi proposer une offre limitée dans le temps."] },
+      57: { t: "Prépare ta semaine de lancement", mins: 30, why: "Une semaine annoncée à l'avance attire plus de monde.", how: ["Choisis le produit à mettre en avant.", "Écris les 3 vidéos de la semaine : problème, contenu du produit, réponses aux questions.", "Programme un email d'annonce à ta liste."] },
+      58: { t: "Annonce ta semaine de lancement", mins: 20, why: "Tes abonnés doivent savoir quand tout commence.", how: ["Publie la vidéo d'annonce.", "Envoie l'email à ta liste.", "Réponds à chaque question en commentaire."] },
+      59: { t: "Prépare ton mois 3", mins: 20, why: "Tu repars avec un plan, pas à zéro.", how: ["Choisis ton format gagnant.", "Fixe un objectif simple : par exemple un nombre de vidéos et un nombre de ventes.", "Demande au Coach IA un plan de 4 semaines."], ask: "Propose-moi un plan de 4 semaines pour mon mois 3 sur l'angle « " + ang.n + " »", askLabel: "Demander mon mois 3 au Coach IA" }
+    };
+    if (m2[d]) extra.push(m2[d]);
+    return { first: first, extra: extra };
+  }
+
+  function reviewStep(d) {
+    var HOWS = {
+      7: ["Dans le Suivi, repère ta meilleure vidéo.", "Garde son format et son accroche pour la semaine prochaine."],
+      14: ["Dans le Suivi, repère tes 2 meilleures vidéos.", "Garde leur format et abandonne le reste."],
+      21: ["Dans le Suivi, compare tes trois premières semaines.", "Garde les 2 formats qui marchent le mieux."],
+      28: ["Regarde combien de personnes ont téléchargé ton guide.", "Relis les commentaires : ils te donnent ton prochain sujet."],
+      30: ["Ouvre le Suivi : médiane, meilleure vidéo, vidéos au-dessus de 500 vues.", "Note le nombre de téléchargements du guide et de ventes, même s'il est de zéro.", "Choisis ton format gagnant pour le mois 2."],
+      35: ["Compare tes deux accroches testées.", "Garde le type d'accroche qui a le mieux marché."],
+      42: ["Dans le Suivi, regarde si ta médiane a bougé depuis le jour 28.", "Note le nombre d'inscrits à ta liste email et de ventes."],
+      49: ["Compare les vues de tes vidéos sur Reels et Shorts avec celles de TikTok.", "Garde les plateformes qui te rapportent le plus."],
+      56: ["Compare les ventes avant et après ton test de prix.", "Garde le prix qui te convient."],
+      60: ["Ouvre le Suivi : médiane, meilleure vidéo, vidéos au-dessus de 500 et de 3 700 vues.", "Note le total de téléchargements, d'inscrits et de ventes sur les deux mois.", "Choisis ton format gagnant et ton produit phare pour le mois 3.", "Demande à ton Coach IA le plan du mois 3."]
+    };
+    return { t: d === 30 ? "Fais le bilan du premier mois" : d === 60 ? "Fais le bilan des deux mois" : "Fais ton bilan", mins: d >= 30 && d % 30 === 0 ? 15 : 10, why: "Un bilan court te évite de refaire les mêmes erreurs.", how: HOWS[d], goTab: "suivi", goLabel: "Ouvrir le Suivi" };
+  }
+
+  
+function stepsFor(P, d) {
+    var a = state.answers;
+    var n = P.n;
+    var rows = P.days.filter(function (r) { return r.d === d; });
+    var post = rows.filter(function (r) { return r.kind === "post"; })[0];
+    var review = rows.filter(function (r) { return r.kind === "review"; })[0];
+    var steps = [];
+    var title;
+    var FILM = {
+      ecran: [
+        "Prépare ce que tu veux montrer : ton écran, un tableau ou un graphique.",
+        "Plan 1 (0 à 3 secondes) : l'accroche en gros texte, plein écran.",
+        "Plans suivants : montre un point clé à la fois, avec un chiffre ou un exemple.",
+        "Dernier plan : pose une question aux abonnés."
+      ],
+      voix: [
+        "Enregistre ta voix : l'accroche, puis 3 phrases courtes, puis la question de fin.",
+        "Rassemble 4 à 6 clips ou images qui illustrent chaque phrase.",
+        "Prévois un changement d'image toutes les 3 secondes environ."
+      ],
+      visage: [
+        "Filme-toi de face, téléphone à hauteur des yeux, la lumière devant toi.",
+        "Dis l'accroche tout de suite, sans « salut » ni présentation.",
+        "Enchaîne 3 phrases courtes, puis la question de fin.",
+        "Si tu bafouilles, refais la prise : c'est plus rapide que de monter."
+      ]
+    };
+    if (post) {
+      var idea = post.idea || P.ideas[0];
+      var hook = HOOKS[(d - 1) % HOOKS.length].replace("{kw}", idea.kw);
+      var caption = idea.kw + " : " + idea.title + " " + idea.tags.join(" ");
+      title = "Aujourd'hui, tu publies une vidéo";
+      steps.push({ t: "Prends l'idée du jour", mins: 1, why: "Une seule idée par vidéo : c'est ce qui la rend claire.", big: idea.title, small: "Mot-clé à dire et à afficher : « " + idea.kw + " »" });
+      steps.push({ t: "Écris ton accroche", mins: 3, why: "Les 3 premières secondes décident si on reste.", big: hook, how: ["Lis-la à voix haute : elle doit tenir en une phrase.", "Affiche-la en gros texte dès la première image.", "Change quelques mots pour qu'elle sonne comme toi."], copy: hook, copyLabel: "Copier l'accroche" });
+      steps.push({ t: "Tourne ta vidéo", mins: 20, why: "Une vidéo courte et claire est regardée plus souvent jusqu'au bout.", small: "Format conseillé pour ta niche : " + n.format, how: (FILM[a.format] || FILM.ecran).concat(["Vise 20 à 40 secondes."]), ask: "Écris le script de ma vidéo du jour : « " + idea.title + " »", askLabel: "Demander mon script au Coach IA" });
+      steps.push({ t: "Monte et ajoute les sous-titres", mins: 10, why: "Beaucoup de gens regardent sans le son.", how: ["Ouvre CapCut (gratuit), crée un nouveau projet et ajoute tes clips.", "Active les sous-titres automatiques et relis-les.", "Coupe les silences et tout ce qui traîne.", "Exporte en 1080p."] });
+      steps.push({ t: "Publie", mins: 5, why: "Le mot-clé au début de la légende aide les gens à te trouver dans la recherche.", big: caption, how: ["Ouvre TikTok, appuie sur +, importe ta vidéo.", "Colle la légende copiée.", "Vérifie : accroche dans les 3 premières secondes, 3 à 5 hashtags, sous-titres lisibles.", "Publie entre 12 h et 14 h ou entre 19 h et 21 h." + (a.platforms === "p2" ? " Reposte ensuite sur Reels et Shorts." : "")], copy: caption, copyLabel: "Copier la légende" });
+      steps.push({ t: "Réponds aux commentaires", mins: 10, why: "Une réaction rapide aide la vidéo à être montrée à plus de monde.", how: ["Reste 10 minutes sur TikTok après la publication.", "Réponds à chaque commentaire, même par un simple merci.", "Si personne ne commente, écris toi-même une question en commentaire et épingle-la."] });
+    } else {
+      var next = null;
+      for (var k = d + 1; k <= DAYS && !next; k++) {
+        var rr = P.days.filter(function (r) { return r.d === k && r.kind === "post"; })[0];
+        if (rr) next = rr;
+      }
+      title = "Aujourd'hui, tu prépares la suite";
+      steps.push({ t: "Prépare ta prochaine vidéo", mins: 15, why: "Une vidéo préparée à l'avance se tourne deux fois plus vite.", big: next ? next.text : "Choisis une idée dans l'onglet Idées", how: ["Écris l'accroche (demande de l'aide au Coach IA si besoin).", "Note les 3 plans que tu vas filmer.", "Tourne-la tout de suite si tu as le temps."], ask: next ? "Écris le script de ma prochaine vidéo : « " + next.text + " »" : "", askLabel: "Demander mon script au Coach IA" });
+      steps.push({ t: "Note tes chiffres", mins: 5, why: "C'est avec tes chiffres que tu sauras quoi garder.", how: ["Ouvre les statistiques de ta dernière vidéo, 48 heures après sa publication.", "Note les vues, les sauvegardes et les partages dans l'onglet Suivi."], goTab: "suivi", goLabel: "Ouvrir le Suivi" });
+    }
+    var ms = milestones(d, P);
+    steps = ms.first.concat(steps).concat(ms.extra);
+    if (review) steps.push(reviewStep(d));
+    return { title: title, steps: steps };
+  }
+
+  function renderToday(panel, P) {
+    var prog = state.prog;
+    var d = prog.day;
+    if (d > DAYS) { renderDone(panel, P); return; }
+    var M = stepsFor(P, d);
+    if (!prog.steps[d]) prog.steps[d] = [];
+    var done = prog.steps[d];
+    var total = M.steps.reduce(function (s, x) { return s + x.mins; }, 0);
+
+    if (state.flash) {
+      panel.appendChild(h("div", { "class": "card flash", text: state.flash }));
+      state.flash = "";
+    }
+    var dots = h("div", { "class": "dots", role: "img", "aria-label": "Jour " + d + " sur " + DAYS });
+    for (var i = 1; i <= DAYS; i++) dots.appendChild(h("i", { "class": i < d ? "done" : i === d ? "now" : "" }));
+    var label = h("p", { "class": "small" });
+    panel.appendChild(h("div", { "class": "daybar" }, [
+      h("p", { "class": "eyebrow", text: "Semaine " + weekOf(d) + " · " + WEEKS[weekOf(d) - 1][0] }),
+      h("p", { "class": "daybig", text: "Jour " + d + " sur " + DAYS }),
+      h("h3", { text: M.title }),
+      dots,
+      label
+    ]));
+    var list = h("div", { "class": "panel" });
+    var footer = h("div", { "class": "panel" });
+    panel.appendChild(list);
+    panel.appendChild(footer);
+
+    function current() {
+      for (var i = 0; i < M.steps.length; i++) if (!done[i]) return i;
+      return M.steps.length;
+    }
+    function ask(text) { state.chatDraft = text; state.tab = "coach"; showCoach(); window.scrollTo(0, 0); }
+
+    function draw(scrollToNow) {
+      var cur = current();
+      list.textContent = "";
+      footer.textContent = "";
+      var remaining = 0;
+      M.steps.forEach(function (s, i) { if (!done[i]) remaining += s.mins; });
+      label.textContent = cur >= M.steps.length ? "Toutes les étapes sont faites." : "Étape " + (cur + 1) + " sur " + M.steps.length + " · environ " + remaining + " min restantes (sur " + total + " min)";
+      var nowCard = null;
+      M.steps.forEach(function (s, i) {
+        if (done[i]) {
+          var redo = h("button", { type: "button", "class": "btn ghost small" }, ["Revoir"]);
+          redo.addEventListener("click", function () { done[i] = false; saveProg(); draw(true); });
+          list.appendChild(h("div", { "class": "card step-mini done" }, [h("span", { "class": "stepnum", text: "✓" }), h("span", { "class": "t", text: s.t }), redo]));
+        } else if (i === cur) {
+          var card = h("div", { "class": "card step now" });
+          nowCard = card;
+          card.appendChild(h("p", { "class": "nowtag", text: "À faire maintenant" }));
+          card.appendChild(h("div", { "class": "step-head" }, [h("span", { "class": "stepnum", text: String(i + 1) }), h("h4", { text: s.t }), h("span", { "class": "mins", text: "≈ " + s.mins + " min" })]));
+          if (s.why) card.appendChild(h("p", { "class": "why", text: s.why }));
+          if (s.big) card.appendChild(h("p", { "class": "stepbig", text: s.big }));
+          if (s.small) card.appendChild(h("p", { "class": "small", text: s.small }));
+          if (s.how) card.appendChild(h("ol", { "class": "how" }, s.how.map(function (x) { return h("li", { text: x }); })));
+          var actions = h("div", { "class": "step-actions" });
+          if (s.copy) {
+            var cp = h("button", { type: "button", "class": "btn ghost small" }, [s.copyLabel || "Copier"]);
+            cp.addEventListener("click", function () { copyText(s.copy, cp); });
+            actions.appendChild(cp);
+          }
+          if (s.goTab) {
+            var go = h("button", { type: "button", "class": "btn ghost small" }, [s.goLabel || "Ouvrir"]);
+            go.addEventListener("click", function () { state.tab = s.goTab; showCoach(); window.scrollTo(0, 0); });
+            actions.appendChild(go);
+          }
+          if (actions.children.length) card.appendChild(actions);
+          var helpText = s.ask || ("J'ai besoin d'aide pour l'étape « " + s.t + " » du jour " + d + " de mon plan.");
+          var help = h("button", { type: "button", "class": "askai" }, [s.askLabel || "Demander de l'aide au Coach IA"]);
+          help.addEventListener("click", function () { ask(helpText); });
+          card.appendChild(help);
+          var ok = h("button", { type: "button", "class": "btn bigbtn", id: "step-done" }, ["Étape terminée"]);
+          ok.addEventListener("click", function () { done[i] = true; saveProg(); draw(true); });
+          card.appendChild(ok);
+          list.appendChild(card);
+        } else {
+          list.appendChild(h("div", { "class": "card step-mini later" }, [h("span", { "class": "stepnum", text: String(i + 1) }), h("span", { "class": "t", text: s.t }), h("span", { "class": "mins", text: "≈ " + s.mins + " min" })]));
+        }
+      });
+      if (cur >= M.steps.length) {
+        var fin = h("button", { type: "button", "class": "btn bigbtn", id: "finish-day" }, [d === DAYS ? "Terminer mon plan" : "Jour terminé, passer au suivant"]);
+        fin.addEventListener("click", function () {
+          prog.day = d + 1;
+          if (d < DAYS) state.flash = "Jour " + d + " terminé, bien joué. Voici le jour " + (d + 1) + ".";
+          saveProg();
+          showCoach();
+          window.scrollTo(0, 0);
+        });
+        footer.appendChild(fin);
+      }
+      if (d > 1) {
+        var back = h("button", { type: "button", "class": "linkbtn" }, ["Revenir au jour " + (d - 1)]);
+        back.addEventListener("click", function () { prog.day = d - 1; saveProg(); showCoach(); window.scrollTo(0, 0); });
+        footer.appendChild(back);
+      }
+      if (scrollToNow) {
+        var target = nowCard || footer;
+        setTimeout(function () { try { target.scrollIntoView({ block: "start", behavior: "smooth" }); } catch (e) { /* sans effet */ } }, 30);
+      }
+    }
+    draw(false);
+  }
+
+  
+function renderDone(panel, P) {
+    var items = [
+      "Ouvre le Suivi et note les chiffres de toutes tes vidéos.",
+      "Regarde les téléchargements de ton guide et les ventes de ton produit, même s'ils sont à zéro : c'est ta base de départ.",
+      "Demande à ton Coach IA le plan du mois 3."
+    ];
+    var go = h("button", { type: "button", "class": "btn" }, ["Ouvrir le Suivi"]);
+    go.addEventListener("click", function () { state.tab = "suivi"; showCoach(); window.scrollTo(0, 0); });
+    var ai = h("button", { type: "button", "class": "btn ghost" }, ["Demander le mois 3"]);
+    ai.addEventListener("click", function () { state.chatDraft = "J'ai fini mes deux mois. Propose-moi le plan du mois 3 pour mon angle « " + P.angle.n + " »."; state.tab = "coach"; showCoach(); window.scrollTo(0, 0); });
+    var again = h("button", { type: "button", "class": "linkbtn" }, ["Recommencer le plan"]);
+    again.addEventListener("click", function () { state.prog = { day: 1, steps: {} }; saveProg(); showCoach(); window.scrollTo(0, 0); });
+    panel.appendChild(h("div", { "class": "card" }, [
+      h("p", { "class": "eyebrow", text: "Plan terminé" }),
+      h("h3", { text: "Tu as fini les 60 jours." }),
+      h("ul", { "class": "incl" }, items.map(function (t) { return h("li", { text: t }); })),
+      h("div", { "class": "actions" }, [go, ai])
+    ]));
+    panel.appendChild(again);
+  }
+
+  function renderIdeas(panel, P) {
+    panel.appendChild(h("p", { "class": "hint", text: "Format conseillé pour ta niche : " + P.n.format + " Ce sont des points de départ. Vérifie toujours un chiffre ou un fait avant de le publier, et ne dis que ce que tu as vraiment fait." }));
+    var shown = Math.min(state.ideasShown || 10, P.ideas.length);
+    P.ideas.slice(0, shown).forEach(function (idea, i) {
+      var caption = idea.kw + " : " + idea.title + " " + idea.tags.join(" ");
+      var copy = h("button", { type: "button", "class": "btn ghost small" }, ["Copier la légende"]);
+      copy.addEventListener("click", function () { copyText(caption, copy); });
+      panel.appendChild(h("div", { "class": "card idea" }, [
+        h("span", { "class": "kicker", text: "Idée " + (i + 1) + " · " + idea.angle + (idea.series ? " · format série" : "") }),
+        h("h4", { text: idea.title }),
+        h("div", { "class": "meta" }, idea.tags.map(function (t) { return h("span", { "class": "chip mono", text: t }); })),
+        h("p", { "class": "small", text: "Mot-clé à dire et à afficher dans les 3 premières secondes : « " + idea.kw + " »" }),
+        h("div", { "class": "row" }, [h("span", { "class": "small", text: "20 à 40 secondes" }), copy])
+      ]));
+    });
+    if (shown < P.ideas.length) {
+      var more = h("button", { type: "button", "class": "btn ghost" }, ["Voir 10 idées de plus (" + shown + " sur " + P.ideas.length + ")"]);
+      more.addEventListener("click", function () { state.ideasShown = shown + 10; showCoach(); });
+      panel.appendChild(more);
+    }
+  }
+
+  function chatRules(P) {
+    var a = state.answers;
+    var GOALS = { audience: "faire grossir son audience", revenus: "gagner ses premiers revenus", vendre: "vendre ses produits" };
+    var FORMATS = { ecran: "sans visage, capture d'écran et texte à l'écran", voix: "sans visage, sa voix sur des images", visage: "en apparaissant à l'écran" };
+    var d = Math.min(state.prog.day, DAYS);
+    var M = stepsFor(P, d);
+    var todayIdea = M.steps[0] && M.steps[0].big ? M.steps[0].big : "aucune";
+    return [
+      "Tu es le Coach IA de « Boussole Niche », une appli qui guide des débutants pour publier sur TikTok.",
+      "Tu parles français, tu tutoies, ton chaleureux et simple, phrases courtes. Tu tiens la main de la personne : étapes concrètes et courtes, 150 mots maximum, sauf pour un script.",
+      "Contexte de la personne : niche « " + P.n.name + " », angle « " + P.angle.n + " », mot-clé « " + P.angle.kw + " », objectif : " + GOALS[a.goal] + ", format : " + FORMATS[a.format] + ", rythme : " + P.perWeek + " vidéos par semaine, jour du plan : " + d + " sur 60, idée du jour : « " + todayIdea + " ».",
+      "Règles : ne promets jamais de vues, d'abonnés ni de revenus. N'invente aucun chiffre ni aucune étude. Si on te parle de vues, dis que la vidéo médiane fait environ 500 vues d'après une analyse Buffer de 11 millions de vidéos, et que chaque cas est différent.",
+      "N'invente jamais d'interview, de citation ou de déclaration d'une personne réelle. Pour le foot, pas d'extraits de matchs protégés par des droits. Pas de conseil médical, juridique ou financier personnalisé. Si la question n'a rien à voir avec TikTok, la création de contenu ou le plan, ramène poliment au sujet. Si tu ne sais pas, dis-le.",
+      "Quand on te demande un script, donne : l'accroche des 3 premières secondes, 3 à 5 scènes courtes avec le texte à afficher et ce que dit la voix, la fin, puis la légende avec 3 hashtags. Pas de mise en forme markdown : des lignes courtes et des tirets."
+    ].join("\n");
+  }
+
+  var CHAT_ERRORS = {
+    not_granted: "Tu n'as pas autorisé l'accès à Claude. Recharge la page pour réessayer.",
+    sampling_disabled: "Le Coach IA n'est pas disponible sur ce compte.",
+    capability_disabled: "Le Coach IA n'est pas disponible ici.",
+    capability_removed: "Le Coach IA n'est pas disponible ici.",
+    not_declared: "Le Coach IA n'est pas disponible ici.",
+    rate_limited: "Trop de messages d'un coup. Réessaie dans un instant.",
+    session_expired: "Ta session a expiré. Reconnecte-toi puis réessaie.",
+    refused: "Je ne peux pas répondre à ça. Reformule ta question."
+  };
+
+  var QUICK = [
+    "Écris le script de ma vidéo du jour",
+    "Donne-moi 5 autres idées pour mon angle",
+    "Mes vues sont faibles, que changer ?",
+    "Comment répondre aux commentaires ?"
+  ];
+
+  var sampleFn = null;
+  var sampleReady = false;
+  var samplePromise;
+  try {
+    samplePromise = (window.claude && typeof window.claude.use === "function") ? window.claude.use("sample") : Promise.resolve(null);
+  } catch (e) {
+    samplePromise = Promise.resolve(null);
+  }
+  samplePromise = Promise.resolve(samplePromise).then(function (s) { sampleFn = s; sampleReady = true; refreshChatAvailability(); return s; }, function () { sampleReady = true; refreshChatAvailability(); return null; });
+
+  function refreshChatAvailability() {
+    var st = document.getElementById("chat-status");
+    if (!st || !sampleReady || sampleFn) return;
+    st.textContent = "Le Coach IA n'est pas disponible dans cette version. Ton plan et tes missions restent utilisables.";
+    ["chat-input", "chat-send"].forEach(function (id) { var el = document.getElementById(id); if (el) el.disabled = true; });
+    Array.prototype.forEach.call(document.querySelectorAll(".quick button"), function (b) { b.disabled = true; });
+  }
+
+  function renderChat(panel, P) {
+    panel.appendChild(h("div", { "class": "card" }, [
+      h("p", { "class": "eyebrow", text: "Coach IA" }),
+      h("p", { text: "Pose une question sur ta niche, tes vidéos ou ton plan. Je connais ton angle et ton jour du plan." }),
+      h("p", { "class": "small", id: "chat-status", text: "Réponses générées par une IA : vérifie-les. Aucun résultat n'est garanti." })
+    ]));
+
+    var quick = h("div", { "class": "quick" });
+    QUICK.forEach(function (q) {
+      var b = h("button", { type: "button", "class": "btn ghost small" }, [q]);
+      b.addEventListener("click", function () { send(q); });
+      quick.appendChild(b);
+    });
+    panel.appendChild(quick);
+
+    var log = h("div", { "class": "chat", id: "chat-log", role: "log", "aria-live": "polite" });
+    state.chat.forEach(function (m) { log.appendChild(h("div", { "class": "bubble " + (m.role === "user" ? "u" : "a"), text: m.content })); });
+    panel.appendChild(log);
+
+    var input = h("textarea", { id: "chat-input", rows: "2", placeholder: "Écris ta question…", "aria-label": "Ta question pour le Coach IA" });
+    if (state.chatDraft) { input.value = state.chatDraft; state.chatDraft = ""; }
+    var sendBtn = h("button", { type: "button", "class": "btn", id: "chat-send" }, ["Envoyer"]);
+    var stopBtn = h("button", { type: "button", "class": "btn ghost", id: "chat-stop" }, ["Stop"]);
+    stopBtn.hidden = true;
+    var form = h("div", { "class": "chatform" }, [input, sendBtn, stopBtn]);
+    panel.appendChild(form);
+
+    function setBusy(b) {
+      state.chatBusy = b;
+      sendBtn.disabled = b;
+      stopBtn.hidden = !b;
+    }
+    function addBubble(kind, text) {
+      var el = h("div", { "class": "bubble " + kind, text: text });
+      log.appendChild(el);
+      el.scrollIntoView({ block: "nearest" });
+      return el;
+    }
+    function send(text) {
+      text = (text || "").trim();
+      if (!text || state.chatBusy) return;
+      input.value = "";
+      state.chat.push({ role: "user", content: text });
+      addBubble("u", text);
+      var bubble = addBubble("a pending", "Je réfléchis…");
+      var ctl = new AbortController();
+      stopBtn.onclick = function () { ctl.abort(); };
+      setBusy(true);
+      samplePromise.then(function (sample) {
+        if (!sample) throw { code: "capability_disabled" };
+        var turns = [{ role: "user", content: chatRules(P) }].concat(state.chat.slice(-12));
+        return sample(turns, {
+          cache: false,
+          modelTier: "quick",
+          signal: ctl.signal,
+          onText: function (u) { bubble.className = "bubble a"; bubble.textContent = u.text; bubble.scrollIntoView({ block: "nearest" }); }
+        });
+      }).then(function (res) {
+        state.chat.push({ role: "assistant", content: res.text });
+        bubble.className = "bubble a";
+        bubble.textContent = res.text + (res.truncated ? "\n\n(Réponse coupée : demande-moi la suite.)" : "");
+      }).catch(function (e) {
+        var code = e && e.code;
+        if (code === "cancelled") {
+          if (e.text) { state.chat.push({ role: "assistant", content: e.text }); bubble.className = "bubble a"; bubble.textContent = e.text; }
+          else { bubble.remove(); }
+        } else {
+          var msg = CHAT_ERRORS[code] || "Un souci est survenu. Réessaie.";
+          bubble.className = "bubble a err";
+          bubble.textContent = (e && e.text ? e.text + "\n\n" : "") + msg;
+        }
+      }).then(function () { setBusy(false); });
+    }
+    sendBtn.addEventListener("click", function () { send(input.value); });
+    input.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); send(input.value); }
+    });
+    if (state.chatBusy) setBusy(true);
+    setTimeout(refreshChatAvailability, 0);
+  }
+
+  
+function renderTracker(panel) {
+    var filled = 0;
+    state.stats.forEach(function (r, i) { if (r && (r.v != null || r.s != null || r.p != null)) filled = i + 1; });
+    var rowsN = Math.min(60, Math.max(state.trackRows || 10, Math.ceil(filled / 10) * 10));
+    panel.appendChild(h("p", { "class": "hint", text: "Note les chiffres de tes vidéos (jusqu'à 60), 48 heures après leur publication. Ils restent sur cet appareil." }));
+    var grid = h("div", { "class": "track" });
+    grid.appendChild(h("span", { "class": "hd", text: "#" }));
+    ["Vues", "Sauvegardes", "Partages"].forEach(function (t) { grid.appendChild(h("span", { "class": "hd", text: t })); });
+    var inputs = [];
+    for (var i = 0; i < rowsN; i++) {
+      grid.appendChild(h("span", { "class": "num", text: String(i + 1) }));
+      ["v", "s", "p"].forEach(function (k) {
+        var val = state.stats[i] && state.stats[i][k] != null ? String(state.stats[i][k]) : "";
+        var f = h("input", { "class": "field", id: "f-" + k + i, type: "number", inputmode: "numeric", min: "0", value: val, "aria-label": (k === "v" ? "Vues" : k === "s" ? "Sauvegardes" : "Partages") + " de la vidéo " + (i + 1) });
+        f.setAttribute("data-i", String(i));
+        f.setAttribute("data-k", k);
+        inputs.push(f);
+        grid.appendChild(f);
+      });
+    }
+    panel.appendChild(grid);
+    if (rowsN < 60) {
+      var more = h("button", { type: "button", "class": "btn ghost small" }, ["Ajouter 10 vidéos"]);
+      more.addEventListener("click", function () { state.trackRows = rowsN + 10; showCoach(); });
+      panel.appendChild(more);
+    }
+    var out = h("div", { "class": "card" });
+    panel.appendChild(out);
+
+    function recompute() {
+      var views = [];
+      for (var i = 0; i < 60; i++) {
+        var r = state.stats[i];
+        if (r && r.v != null && !isNaN(r.v)) views.push(r.v);
+      }
+      out.textContent = "";
+      out.appendChild(h("p", { "class": "eyebrow", text: "Tes vrais chiffres" }));
+      if (views.length < 3) {
+        out.appendChild(h("p", { text: "Renseigne les vues d'au moins 3 vidéos pour voir ton bilan." }));
+        return;
+      }
+      var med = median(views);
+      var best = Math.max.apply(null, views);
+      var above = views.filter(function (v) { return v > 500; }).length;
+      var top = views.filter(function (v) { return v >= 3700; }).length;
+      out.appendChild(h("div", { "class": "stat-row" }, [
+        h("div", { "class": "stat" }, [h("b", { text: fmt(med) }), h("span", { text: "vues, ta vidéo médiane" })]),
+        h("div", { "class": "stat" }, [h("b", { text: fmt(best) }), h("span", { text: "vues, ta meilleure vidéo" })]),
+        h("div", { "class": "stat" }, [h("b", { text: above + " / " + views.length }), h("span", { text: "vidéos au-dessus de 500 vues" })]),
+        h("div", { "class": "stat" }, [h("b", { text: String(top) }), h("span", { text: "vidéos au-dessus de 3 700 vues" })])
+      ]));
+      out.appendChild(h("p", { "class": "small", text: med >= 500 ? "Ta médiane dépasse environ 500 vues, la médiane observée sur 11 millions de vidéos. 3 700 vues est le seuil des 10 % de vidéos les plus vues à 1 vidéo par semaine." : "Ta médiane est sous environ 500 vues, la médiane observée sur 11 millions de vidéos. C'est courant au début : juge sur 10 vidéos." }));
+      if (views.length >= 6) {
+        out.appendChild(h("p", { text: "Prochaine étape : reprends le sujet, la durée et l'accroche de tes 3 vidéos les plus vues, et fais-en ta série de la semaine." }));
+      } else {
+        out.appendChild(h("p", { text: "Continue jusqu'à 6 vidéos avant de changer quoi que ce soit." }));
+      }
+    }
+
+    inputs.forEach(function (f) {
+      f.addEventListener("input", function () {
+        var i = parseInt(f.getAttribute("data-i"), 10);
+        var k = f.getAttribute("data-k");
+        if (!state.stats[i]) state.stats[i] = {};
+        state.stats[i][k] = f.value === "" ? null : Number(f.value);
+        store.set("bn_stats", state.stats);
+        recompute();
+      });
+    });
+    recompute();
+  }
+
+  /* ---------- Démarrage ---------- */
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
